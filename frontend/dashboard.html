@@ -1,0 +1,1255 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CloudDrive – Dashboard</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      :root {
+        --bg: #020617;
+        --bg-elevated: #020617;
+        --accent: #3b82f6;
+        --accent-soft: rgba(59, 130, 246, 0.12);
+        --border-subtle: rgba(148, 163, 184, 0.2);
+        --border-heavy: rgba(30, 64, 175, 0.8);
+        --muted: #9ca3af;
+        --text: #f9fafb;
+        --text-soft: #e5e7eb;
+        --danger: #f97373;
+        --radius-lg: 14px;
+        --radius-md: 10px;
+        --radius-pill: 999px;
+        --shadow-soft: 0 14px 30px rgba(15, 23, 42, 0.7);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        margin: 0;
+        padding: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Inter", sans-serif;
+        font-size: 15px;
+        line-height: 1.5;
+        background: #020617;
+        color: var(--text);
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        align-items: stretch;
+        justify-content: center;
+        padding: 16px;
+      }
+
+      .shell {
+        display: grid;
+        grid-template-columns: 260px minmax(0, 1fr);
+        gap: 16px;
+        width: 100%;
+        max-width: 1440px;
+        height: 100%;
+        max-height: 860px;
+      }
+
+      .panel {
+        background: var(--bg-elevated);
+        border-radius: 16px;
+        border: 1px solid var(--border-subtle);
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .sidebar {
+        padding: 16px 14px 14px;
+      }
+
+      .sidebar-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 20px;
+      }
+
+      .logo {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .logo-mark {
+        width: 24px;
+        height: 24px;
+        border-radius: 6px;
+        background: linear-gradient(135deg, #3b82f6, #0f766e);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .logo-mark-inner {
+        width: 11px;
+        height: 11px;
+        border-radius: 4px;
+        background: #e5e7eb;
+      }
+
+      .logo-text {
+        font-weight: 600;
+        letter-spacing: 0.03em;
+      }
+
+      .logo-sub {
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+
+      .user-pic {
+        width: 28px;
+        height: 28px;
+        border-radius: 999px;
+        background: #1e293b;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--text-soft);
+      }
+
+      .sidebar-actions {
+        margin-bottom: 20px;
+      }
+
+      .btn-primary {
+        width: 100%;
+        border: 0;
+        border-radius: var(--radius-pill);
+        padding: 9px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        color: #f9fafb;
+        background: var(--accent);
+        cursor: pointer;
+        transition: transform 0.12s ease-out, box-shadow 0.12s ease-out,
+          filter 0.12s ease-out;
+      }
+
+      .btn-primary span.icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.92);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        line-height: 1;
+      }
+
+      .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 36px rgba(37, 99, 235, 0.9);
+        filter: brightness(1.05);
+      }
+
+      .btn-primary:active {
+        transform: translateY(1px) scale(0.99);
+        box-shadow: 0 10px 20px rgba(15, 23, 42, 0.95);
+      }
+
+      .nav-section-label {
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.18em;
+        color: var(--muted);
+        margin: 14px 6px 4px;
+      }
+
+      .nav-list {
+        list-style: none;
+        margin: 0;
+        padding: 4px;
+        border-radius: 10px;
+        background: #020617;
+        border: 1px solid rgba(15, 23, 42, 0.9);
+      }
+
+      .nav-item {
+        margin: 1px 0;
+      }
+
+      .nav-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        font-size: 14px;
+        color: var(--muted);
+        text-decoration: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .nav-link span.icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        background: rgba(15, 23, 42, 0.9);
+        color: var(--muted);
+      }
+
+      .nav-link span.label {
+        flex: 1;
+      }
+
+      .nav-link span.badge {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.3);
+      }
+
+      .nav-link.active {
+        color: var(--text);
+        background: rgba(37, 99, 235, 0.22);
+        border-radius: 8px;
+      }
+
+      .nav-link.active span.icon {
+        color: #e5e7eb;
+      }
+
+      .nav-link:hover:not(.active) {
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding-top: 18px;
+        border-top: 1px solid rgba(15, 23, 42, 0.96);
+      }
+
+      .storage-card {
+        background: rgba(15, 23, 42, 0.98);
+        border-radius: 16px;
+        padding: 12px 12px 10px;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        box-shadow: 0 10px 26px rgba(15, 23, 42, 0.95);
+      }
+
+      .storage-header {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 10px;
+      }
+
+      .storage-title {
+        font-size: 13px;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      .storage-pill {
+        font-size: 12px;
+        padding: 2px 8px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(191, 219, 254, 0.65);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .storage-meters {
+        position: relative;
+        margin-bottom: 6px;
+        display: flex;
+        gap: 4px;
+      }
+
+      .meter-track {
+        flex: 1;
+        height: 7px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.8);
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 42, 0.96);
+      }
+
+      .meter-fill {
+        height: 100%;
+        border-radius: 999px;
+        background: linear-gradient(
+          90deg,
+          #22c55e,
+          #a3e635,
+          #facc15,
+          #fb923c,
+          #f97316
+        );
+        background-size: 200% 100%;
+        animation: shimmer 4s linear infinite;
+      }
+
+      .storage-legend {
+        position: relative;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: #dbeafe;
+      }
+
+      .storage-legend span.sub {
+        color: #c4dcff;
+        opacity: 0.9;
+      }
+
+      .storage-legend span.label {
+        font-weight: 500;
+      }
+
+      .storage-legend span.value {
+        font-variant-numeric: tabular-nums;
+      }
+
+      .chip-row {
+        margin-top: 10px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        position: relative;
+      }
+
+      .chip {
+        border-radius: 999px;
+        padding: 3px 10px 4px;
+        font-size: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(191, 219, 254, 0.4);
+        box-shadow: var(--shadow-chip);
+      }
+
+      .chip-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.3);
+      }
+
+      .chip-dot.warn {
+        background: #fb923c;
+        box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.4);
+      }
+
+      .chip-dot.danger {
+        background: #f97373;
+        box-shadow: 0 0 0 3px rgba(248, 113, 113, 0.5);
+      }
+
+      .chip span.label {
+        opacity: 0.95;
+      }
+
+      .chip span.data {
+        font-variant-numeric: tabular-nums;
+        color: #bfdbfe;
+      }
+
+      .chip span.hotkey {
+        font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 10px;
+        opacity: 0.85;
+      }
+
+      .chip span.hotkey kbd {
+        padding: 1px 5px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.7);
+      }
+
+      .main {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .main-header {
+        padding: 12px 16px 8px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.95);
+        background: #020617;
+      }
+
+      .search-shell {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .search-input-wrapper {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 11px;
+        border-radius: 999px;
+        background: #020617;
+        border: 1px solid rgba(30, 64, 175, 0.55);
+      }
+
+      .search-input-wrapper span.icon {
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .search-input-wrapper input {
+        flex: 1;
+        border: none;
+        background: transparent;
+        color: var(--text);
+        font-size: 14px;
+        outline: none;
+      }
+
+      .search-input-wrapper input::placeholder {
+        color: var(--muted);
+      }
+
+      .search-hotkey {
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      .search-hotkey kbd {
+        font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 10px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        border: 1px solid rgba(148, 163, 184, 0.5);
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .view-toggles {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .icon-button {
+        border-radius: 999px;
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--muted);
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background 0.12s ease-out, color 0.12s ease-out,
+          border-color 0.12s ease-out, transform 0.1s ease-out;
+      }
+
+      .icon-button.active {
+        color: #dbeafe;
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(59, 130, 246, 0.8),
+          rgba(15, 23, 42, 0.98)
+        );
+        border-color: rgba(191, 219, 254, 0.8);
+        box-shadow: 0 10px 24px rgba(15, 23, 42, 0.95);
+      }
+
+      .icon-button:hover {
+        transform: translateY(-1px);
+      }
+
+      .user-strip {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding-left: 10px;
+        border-left: 1px solid rgba(15, 23, 42, 0.85);
+      }
+
+      .user-name {
+        font-size: 12px;
+        display: flex;
+        flex-direction: column;
+        line-height: 1.1;
+      }
+
+      .user-name span.sub {
+        color: var(--muted);
+        font-size: 11px;
+      }
+
+      .main-toolbar {
+        padding: 8px 16px 10px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(15, 23, 42, 0.95);
+        background: #020617;
+      }
+
+      .breadcrumbs {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 14px;
+        color: var(--muted);
+      }
+
+      .breadcrumbs span.current {
+        color: var(--text);
+        font-weight: 500;
+      }
+
+      .toolbar-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .pill-button {
+        border-radius: 999px;
+        border: 1px solid rgba(30, 64, 175, 0.9);
+        background: rgba(15, 23, 42, 0.96);
+        color: var(--muted);
+        font-size: 13px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 9px;
+        cursor: pointer;
+      }
+
+      .pill-button span.icon {
+        font-size: 13px;
+      }
+
+      .pill-button.primary {
+        color: #dbeafe;
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(59, 130, 246, 0.9),
+          rgba(37, 99, 235, 0.98)
+        );
+        border-color: rgba(191, 219, 254, 0.9);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.96);
+      }
+
+      .main-body {
+        position: relative;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        padding: 12px 16px 14px;
+        background: #020617;
+      }
+
+      .card {
+        background: #020617;
+        border-radius: 12px;
+        border: 1px solid rgba(17, 24, 39, 1);
+        box-shadow: none;
+        padding: 10px 10px 10px;
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+      }
+
+      .card-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 6px;
+      }
+
+      .card-title-row {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .card-title {
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      .card-subtitle {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .card-tabs {
+        display: inline-flex;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.96);
+        border-radius: 999px;
+        padding: 2px;
+        border: 1px solid rgba(30, 64, 175, 0.8);
+      }
+
+      .card-tab {
+        border-radius: 999px;
+        padding: 3px 9px;
+        font-size: 11px;
+        color: var(--muted);
+        cursor: pointer;
+      }
+
+      .card-tab.active {
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(59, 130, 246, 0.85),
+          rgba(37, 99, 235, 0.96)
+        );
+        color: #dbeafe;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.95);
+      }
+
+      .file-header-row {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.6fr;
+        gap: 6px;
+        padding: 6px 6px;
+        border-radius: 8px;
+        font-size: 12px;
+        color: var(--muted);
+        border: 1px solid rgba(15, 23, 42, 0.9);
+        background: #020617;
+      }
+
+      .file-list {
+        margin-top: 4px;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid rgba(15, 23, 42, 0.98);
+        background: #020617;
+        min-height: 0;
+        flex: 1;
+      }
+
+      .file-row {
+        display: grid;
+        grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.6fr;
+        gap: 6px;
+        padding: 6px 6px;
+        font-size: 14px;
+        align-items: center;
+        cursor: default;
+        position: relative;
+      }
+
+      .file-row:hover {
+        background: rgba(30, 64, 175, 0.18);
+      }
+
+      .file-row.selected {
+        background: rgba(37, 99, 235, 0.32);
+      }
+
+      .file-name-cell {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+      }
+
+      .file-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 8px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        background: #020617;
+        border: 1px solid rgba(30, 64, 175, 0.8);
+        color: #bfdbfe;
+      }
+
+      .file-meta {
+        display: flex;
+        flex-direction: column;
+        min-width: 0;
+      }
+
+      .file-name {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .file-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .file-cell {
+        font-size: 13px;
+        color: var(--text-soft);
+      }
+
+      .file-actions {
+        justify-self: flex-end;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+      }
+
+      .tiny-icon {
+        width: 20px;
+        height: 20px;
+        border-radius: 999px;
+        border: 1px solid rgba(30, 64, 175, 0.7);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        color: var(--muted);
+        background: rgba(15, 23, 42, 0.96);
+      }
+
+      .tiny-icon.primary {
+        color: #dbeafe;
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(59, 130, 246, 0.9),
+          rgba(37, 99, 235, 0.98)
+        );
+        border-color: rgba(191, 219, 254, 0.8);
+      }
+
+      .empty-hint {
+        margin-top: 12px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .empty-hint span.kbd {
+        font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas,
+          "Liberation Mono", "Courier New", monospace;
+        font-size: 10px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(148, 163, 184, 0.55);
+      }
+
+      .side-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        min-height: 0;
+      }
+
+      .quick-access-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 6px;
+      }
+
+      .qa-item {
+        border-radius: 14px;
+        padding: 8px 8px 6px;
+        background: #020617;
+        border: 1px solid rgba(15, 23, 42, 0.96);
+        cursor: default;
+      }
+
+      .qa-item[data-type="folder"] {
+        border-color: rgba(56, 189, 248, 0.6);
+      }
+
+      .qa-item[data-type="recent"] {
+        border-color: rgba(59, 130, 246, 0.7);
+      }
+
+      .qa-icon {
+        width: 22px;
+        height: 22px;
+        border-radius: 9px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .qa-icon.folder {
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(34, 211, 238, 0.9),
+          rgba(8, 47, 73, 0.96)
+        );
+        color: #e0f2fe;
+      }
+
+      .qa-icon.star {
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(250, 204, 21, 0.9),
+          rgba(120, 53, 15, 0.96)
+        );
+        color: #fef9c3;
+      }
+
+      .qa-icon.file {
+        background: radial-gradient(
+          circle at 0 0,
+          rgba(59, 130, 246, 0.95),
+          rgba(15, 23, 42, 0.98)
+        );
+        color: #eff6ff;
+      }
+
+      .qa-label {
+        font-size: 13px;
+      }
+
+      .qa-sub {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .activity-list {
+        margin-top: 6px;
+        border-radius: 12px;
+        border: 1px solid rgba(15, 23, 42, 0.96);
+        background: #020617;
+        padding: 6px 6px 4px;
+        font-size: 12px;
+      }
+
+      .activity-item {
+        display: grid;
+        grid-template-columns: minmax(0, 2.1fr) 0.9fr;
+        gap: 6px;
+        padding: 4px 4px;
+        border-radius: 8px;
+        align-items: center;
+      }
+
+      .activity-item:nth-child(2n) {
+        background: rgba(15, 23, 42, 0.95);
+      }
+
+      .activity-main {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+      }
+
+      .activity-badge {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        border: 1px solid rgba(30, 64, 175, 0.9);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+        background: rgba(15, 23, 42, 0.98);
+        color: var(--muted);
+      }
+
+      .activity-text {
+        min-width: 0;
+      }
+
+      .activity-text span.primary {
+        font-size: 12px;
+      }
+
+      .activity-text span.secondary {
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .activity-time {
+        text-align: right;
+        color: var(--muted);
+        font-variant-numeric: tabular-nums;
+        font-size: 11px;
+      }
+
+      .outline-pill {
+        border-radius: 999px;
+        border: 1px dashed rgba(148, 163, 184, 0.5);
+        padding: 4px 8px;
+        font-size: 11px;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        margin-top: 6px;
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 0 0;
+        }
+        100% {
+          background-position: 200% 0;
+        }
+      }
+
+      @media (max-width: 1024px) {
+        body {
+          padding: 10px;
+        }
+        .shell {
+          grid-template-columns: minmax(0, 1fr);
+          grid-template-rows: auto auto;
+          max-height: none;
+          height: auto;
+        }
+        .sidebar {
+          min-height: 0;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-header {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .user-strip {
+          border: none;
+          padding-left: 0;
+          margin-left: auto;
+        }
+        .main-grid {
+          grid-template-columns: minmax(0, 1fr);
+          grid-auto-rows: auto;
+        }
+      }
+
+      @media (max-width: 640px) {
+        body {
+          padding: 6px;
+        }
+        .panel {
+          border-radius: 18px;
+        }
+        .sidebar {
+          display: none;
+        }
+        .shell {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="shell">
+      <aside class="panel sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <div class="logo-mark">
+              <div class="logo-mark-inner"></div>
+            </div>
+            <div>
+              <div class="logo-text">CloudDrive</div>
+              <div class="logo-sub">Personal cloud</div>
+            </div>
+          </div>
+          <div class="user-pic">AW</div>
+        </div>
+
+        <div class="sidebar-actions">
+          <button class="btn-primary" type="button">
+            <span class="icon"><i class="fa-solid fa-plus"></i></span>
+            <span>New</span>
+          </button>
+        </div>
+
+        <div class="nav-section">
+          <div class="nav-section-label">Views</div>
+          <ul class="nav-list">
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <span class="icon"><i class="fa-regular fa-file-lines"></i></span>
+                <span class="label">Documents</span>
+                <span class="badge">24</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <span class="icon"><i class="fa-regular fa-image"></i></span>
+                <span class="label">Media</span>
+                <span class="badge">9</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a href="#" class="nav-link">
+                <span class="icon"><i class="fa-solid fa-gear"></i></span>
+                <span class="label">Settings</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="sidebar-footer">
+          <div class="storage-card">
+            <div class="storage-gradient-orbit"></div>
+            <div class="storage-header">
+              <div class="storage-title">Storage</div>
+              <div class="storage-pill">
+                <span>Plan</span>
+                <span>Free</span>
+              </div>
+            </div>
+            <div class="storage-meters">
+              <div class="meter-track">
+                <div class="meter-fill" style="width: 46%"></div>
+              </div>
+            </div>
+            <div class="storage-legend">
+              <span class="label"
+                ><span class="sub">Used</span> ·
+                <span class="value">4.6 GB / 10 GB</span></span
+              >
+              <span class="sub">≈ 54%</span>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <main class="panel main">
+        <div class="main-header">
+          <div class="search-shell">
+            <div class="search-input-wrapper">
+              <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
+              <input
+                type="search"
+                placeholder="Search in CloudDrive"
+                aria-label="Search in CloudDrive"
+              />
+            </div>
+          </div>
+
+          <div class="view-toggles">
+            <button class="icon-button active" type="button" aria-label="List">
+              <i class="fa-solid fa-list"></i>
+            </button>
+            <button class="icon-button" type="button" aria-label="Grid">
+              <i class="fa-solid fa-grip"></i>
+            </button>
+          </div>
+
+        </div>
+
+        <div class="main-toolbar">
+          <div class="breadcrumbs">
+            <span><i class="fa-solid fa-hard-drive"></i> My Drive</span>
+            <span><i class="fa-solid fa-chevron-right"></i></span>
+            <span class="current">All files</span>
+          </div>
+          <div class="toolbar-actions">
+            <button class="pill-button" type="button">
+              <span class="icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
+              <span>Upload</span>
+            </button>
+            <button class="pill-button" type="button">
+              <span class="icon"><i class="fa-solid fa-arrow-up-wide-short"></i></span>
+              <span>Sort</span>
+            </button>
+            <button class="pill-button primary" type="button">
+              <span class="icon"><i class="fa-solid fa-folder-plus"></i></span>
+              <span>New folder</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="main-body">
+          <div class="main-grid">
+            <section class="card">
+              <div class="card-header">
+                <div class="card-title-row">
+                  <div class="card-title">Files</div>
+                  <div class="card-subtitle">Mocked data · Sample view</div>
+                </div>
+              </div>
+
+              <div class="file-header-row">
+                <div>Name</div>
+                <div>Owner</div>
+                <div>Last modified</div>
+                <div>Size</div>
+              </div>
+
+              <div class="file-list">
+                <div class="file-row selected">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-regular fa-file-word"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">CloudDrive – Product spec.docx</div>
+                      <div class="file-sub">Mocked preview · Not interactive</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 12, 2026 · 09:14</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span>1.2 MB</span>
+                      <span class="tiny-icon primary">⤵</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="file-row">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-solid fa-folder"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">Architecture diagrams</div>
+                      <div class="file-sub">7 items · Updated yesterday</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 11, 2026 · 18:02</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span class="tiny-icon">⋮</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="file-row">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-regular fa-image"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">dashboard-concept.png</div>
+                      <div class="file-sub">Preview image · 2560×1440</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 10, 2026 · 13:45</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span>3.4 MB</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="file-row">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-solid fa-box-archive"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">lambda-backend.zip</div>
+                      <div class="file-sub">Deployment artifact</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 09, 2026 · 22:18</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span>6.8 MB</span>
+                      <span class="tiny-icon">⋮</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="file-row">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">terraform-plan.txt</div>
+                      <div class="file-sub">Last run: apply · us-east-1</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 08, 2026 · 16:40</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span>420 KB</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="file-row">
+                  <div class="file-name-cell">
+                    <div class="file-icon"><i class="fa-regular fa-file-lines"></i></div>
+                    <div class="file-meta">
+                      <div class="file-name">README.md</div>
+                      <div class="file-sub">Project overview</div>
+                    </div>
+                  </div>
+                  <div class="file-cell">You</div>
+                  <div class="file-cell">Mar 07, 2026 · 08:21</div>
+                  <div class="file-cell">
+                    <div class="file-actions">
+                      <span>8 KB</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="empty-hint">
+                <span>Tip:</span>
+                <span>Drop files here</span>
+              </div>
+            </section>
+          </div>
+
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
+
