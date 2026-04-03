@@ -1,6 +1,13 @@
 const DOM = {
     fileList: "file-list",
-    fileSubtitle: "file-subtitle"
+    fileSubtitle: "file-subtitle",
+    uploadButton: "upload-button",
+    uploadInput: "upload-input"
+};
+
+const STATE = {
+    credentials: null,
+    identityId: null
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -21,6 +28,10 @@ async function main() {
     const credentials = await getCredentials(identityId, idToken);
     console.log(credentials);
 
+    STATE.credentials = credentials;
+    STATE.identityId = identityId;
+
+    setupUpload();
     await listFiles({ credentials, identityId });
 }
 
@@ -301,6 +312,64 @@ function renderFileList(items) {
         row.appendChild(sizeCell);
         listEl.appendChild(row);
     });
+}
+
+function setupUpload() {
+    const button = document.getElementById(DOM.uploadButton);
+    const input = document.getElementById(DOM.uploadInput);
+    if (!button || !input) {
+        return;
+    }
+
+    button.addEventListener("click", () => {
+        input.click();
+    });
+
+    input.addEventListener("change", async () => {
+        console.log(input)
+        const file = input.files && input.files[0];
+        console.log(file)
+        if (!file) {
+            return;
+        }
+        try {
+            await uploadFile(file);
+            input.value = "";
+            await listFiles({ credentials: STATE.credentials, identityId: STATE.identityId });
+        } catch (error) {
+            console.error(error);
+        }
+    });
+}
+
+async function uploadFile(file) {
+    console.log(file)
+    if (!STATE.credentials || !STATE.identityId) {
+        throw new Error("Missing credentials or identityId for upload.");
+    }
+
+    await loadAwsSdk();
+
+    window.AWS.config.update({
+        region: CONFIG.region,
+        credentials: new window.AWS.Credentials(
+            STATE.credentials.AccessKeyId,
+            STATE.credentials.SecretKey,
+            STATE.credentials.SessionToken
+        )
+    });
+
+    const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+    const key = `${buildUserPrefix(STATE.identityId)}${file.name}`;
+
+    await s3
+        .upload({
+            Bucket: CONFIG.bucket,
+            Key: key,
+            Body: file,
+            ContentType: file.type || "application/octet-stream"
+        })
+        .promise();
 }
 
 function buildEmptyRow(message) {
