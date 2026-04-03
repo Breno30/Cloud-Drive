@@ -75,7 +75,7 @@ async function main() {
         const credsResult = await parseJsonResponse(credsResponse, "get-creds");
         console.log(credsResult);
 
-        await listFiles(credsResult.Credentials);
+        await listFiles(credsResult.Credentials, identityId);
     } catch (error) {
         console.error(error);
     }
@@ -144,9 +144,9 @@ function parseJwt(jwt) {
     }
 }
 
-async function listFiles(credentials) {
+async function listFiles(credentials, identityId) {
     if (CONFIG.bucket && CONFIG.region && credentials) {
-        await listFilesWithCredentials(credentials);
+        await listFilesWithCredentials(credentials, identityId);
         return;
     }
     if (CONFIG.listUrl) {
@@ -154,7 +154,7 @@ async function listFiles(credentials) {
     }
 }
 
-async function listFilesWithCredentials(credentials) {
+async function listFilesWithCredentials(credentials, identityId) {
     await loadAwsSdk();
 
     window.AWS.config.update({
@@ -170,7 +170,7 @@ async function listFilesWithCredentials(credentials) {
     const response = await s3
         .listObjectsV2({
             Bucket: CONFIG.bucket,
-            Prefix: CONFIG.listPrefix || ""
+            Prefix: `${CONFIG.listPrefix}/${identityId}`
         })
         .promise();
 

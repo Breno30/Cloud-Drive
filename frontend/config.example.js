@@ -7,7 +7,7 @@ const CONFIG = {
     userPoolId: "us-east-1_yourUserPoolId",
     region: "us-east-1",
     bucket: "your-bucket",
-    listPrefix: "users/your-identity-id/",
+    listPrefixBase: "users",
     listUrl: "",
     awsSdkUrl: "https://sdk.amazonaws.com/js/aws-sdk-2.1571.0.min.js",
     useSessionStorage: true
