@@ -9,7 +9,7 @@
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
   <script src="./config.js"></script>
-  <script src="./script.js?version=5555888"></script>
+  <script src="./script.js?version=855488"></script>
   <style>
     :root {
       --bg: #020617;
@@ -671,7 +671,7 @@
 
     .file-header-row {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr;
+      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.8fr;
       gap: 6px;
       padding: 6px 6px;
       border-radius: 8px;
@@ -693,7 +693,7 @@
 
     .file-row {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr;
+      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.8fr;
       gap: 6px;
       padding: 6px 6px;
       font-size: 0.875rem;
@@ -757,6 +757,11 @@
       display: inline-flex;
       align-items: center;
       gap: 4px;
+      margin: 0 auto;
+    }
+
+    .file-actions-header {
+      margin: 0 auto;
     }
 
     .tiny-icon {
@@ -1075,6 +1080,10 @@
               <div>Name</div>
               <div>Last modified</div>
               <div>Size</div>
+              <div class="file-actions-header">
+                <i class="fa-solid fa-download"></i>
+                Download
+              </div>
             </div>
 
             <div class="file-list" id="file-list"></div>

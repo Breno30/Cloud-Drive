@@ -324,6 +324,13 @@ function renderFileList(items) {
         sizeCell.className = "file-cell";
         sizeCell.textContent = formatBytes(item.size);
 
+        const actionsCell = document.createElement("div");
+        actionsCell.className = "file-actions";
+        const downloadIcon = document.createElement("span");
+        downloadIcon.title = "Download";
+        downloadIcon.innerHTML = `<i class="fa-solid fa-download"></i>`;
+        actionsCell.appendChild(downloadIcon);
+
         row.addEventListener("click", () => {
             downloadFile(item.key).catch((error) => console.error(error));
         });
@@ -331,6 +338,7 @@ function renderFileList(items) {
         row.appendChild(nameCell);
         row.appendChild(dateCell);
         row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
         listEl.appendChild(row);
     });
 }
