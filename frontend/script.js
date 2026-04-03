@@ -306,6 +306,10 @@ function renderFileList(items) {
         sizeCell.className = "file-cell";
         sizeCell.textContent = formatBytes(item.size);
 
+        row.addEventListener("click", () => {
+            downloadFile(item.key).catch((error) => console.error(error));
+        });
+
         row.appendChild(nameCell);
         row.appendChild(ownerCell);
         row.appendChild(dateCell);
@@ -370,6 +374,67 @@ async function uploadFile(file) {
             ContentType: file.type || "application/octet-stream"
         })
         .promise();
+}
+
+async function downloadFile(key) {
+    if (!key) {
+        return;
+    }
+
+    let url = "";
+    if (STATE.credentials && STATE.identityId && CONFIG.bucket && CONFIG.region) {
+        await loadAwsSdk();
+        window.AWS.config.update({
+            region: CONFIG.region,
+            credentials: new window.AWS.Credentials(
+                STATE.credentials.AccessKeyId,
+                STATE.credentials.SecretKey,
+                STATE.credentials.SessionToken
+            )
+        });
+        const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+        url = s3.getSignedUrl("getObject", {
+            Bucket: CONFIG.bucket,
+            Key: key,
+            Expires: 60
+        });
+    }
+
+    await triggerBrowserDownload(url, key);
+}
+
+async function triggerBrowserDownload(url, key) {
+    const filename = key.split("/").pop() || "download";
+    try {
+        const response = await fetch(url, { method: "GET" });
+        if (!response.ok) {
+            throw new Error(`Download failed (status ${response.status})`);
+        }
+        const blob = await response.blob();
+        const objectUrl = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = objectUrl;
+        link.download = filename;
+        link.rel = "noopener";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(objectUrl);
+    } catch (error) {
+        console.error(error);
+        // Fallback: attempt a direct navigation download.
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = filename;
+        link.rel = "noopener";
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+    }
+}
+
+function encodeS3Key(key) {
+    return encodeURIComponent(key).replace(/%2F/g, "/");
 }
 
 function buildEmptyRow(message) {
