@@ -74,6 +74,8 @@ async function main() {
 
         const credsResult = await parseJsonResponse(credsResponse, "get-creds");
         console.log(credsResult);
+
+        await listFiles(credsResult.Credentials);
     } catch (error) {
         console.error(error);
     }
@@ -142,4 +144,210 @@ function parseJwt(jwt) {
     }
 }
 
-main();
+async function listFiles(credentials) {
+    if (CONFIG.bucket && CONFIG.region && credentials) {
+        await listFilesWithCredentials(credentials);
+        return;
+    }
+    if (CONFIG.listUrl) {
+        await listFilesWithPresignedUrl(CONFIG.listUrl);
+    }
+}
+
+async function listFilesWithCredentials(credentials) {
+    await loadAwsSdk();
+
+    window.AWS.config.update({
+        region: CONFIG.region,
+        credentials: new window.AWS.Credentials(
+            credentials.AccessKeyId,
+            credentials.SecretKey,
+            credentials.SessionToken
+        )
+    });
+
+    const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+    const response = await s3
+        .listObjectsV2({
+            Bucket: CONFIG.bucket,
+            Prefix: CONFIG.listPrefix || ""
+        })
+        .promise();
+
+    const items = (response.Contents || [])
+        .map((item) => ({
+            key: item.Key || "",
+            lastModified: item.LastModified ? item.LastModified.toISOString() : "",
+            size: item.Size || 0
+        }))
+        .filter((item) => item.key && !item.key.endsWith("/"));
+
+    renderFileList(items);
+}
+
+async function listFilesWithPresignedUrl(url) {
+    const listResponse = await fetch(url, {
+        method: "GET",
+        redirect: "follow"
+    });
+
+    const xmlText = await listResponse.text();
+    const items = parseS3ListXml(xmlText);
+    renderFileList(items);
+}
+
+function parseS3ListXml(xmlText) {
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(xmlText, "application/xml");
+    const contents = Array.from(xml.getElementsByTagName("Contents"));
+    return contents
+        .map((node) => ({
+            key: getXmlText(node, "Key"),
+            lastModified: getXmlText(node, "LastModified"),
+            size: Number(getXmlText(node, "Size") || 0)
+        }))
+        .filter((item) => item.key && !item.key.endsWith("/"));
+}
+
+function getXmlText(parent, tagName) {
+    const node = parent.getElementsByTagName(tagName)[0];
+    return node ? node.textContent : "";
+}
+
+function renderFileList(items) {
+    const listEl = document.getElementById("file-list");
+    if (!listEl) {
+        return;
+    }
+    listEl.innerHTML = "";
+
+    const subtitle = document.getElementById("file-subtitle");
+    if (subtitle) {
+        subtitle.textContent = "Live data · S3 list";
+    }
+
+    if (!items.length) {
+        listEl.appendChild(buildEmptyRow("No files found."));
+        return;
+    }
+
+    items.forEach((item) => {
+        const row = document.createElement("div");
+        row.className = "file-row";
+
+        const nameCell = document.createElement("div");
+        nameCell.className = "file-name-cell";
+
+        const icon = document.createElement("div");
+        icon.className = "file-icon";
+        icon.innerHTML = `<i class="${iconClassForKey(item.key)}"></i>`;
+
+        const meta = document.createElement("div");
+        meta.className = "file-meta";
+
+        const name = document.createElement("div");
+        name.className = "file-name";
+        name.textContent = item.key.split("/").pop() || item.key;
+
+        const sub = document.createElement("div");
+        sub.className = "file-sub";
+        sub.textContent = item.key;
+
+        meta.appendChild(name);
+        meta.appendChild(sub);
+        nameCell.appendChild(icon);
+        nameCell.appendChild(meta);
+
+        const ownerCell = document.createElement("div");
+        ownerCell.className = "file-cell";
+        ownerCell.textContent = "You";
+
+        const dateCell = document.createElement("div");
+        dateCell.className = "file-cell";
+        dateCell.textContent = formatDate(item.lastModified);
+
+        const sizeCell = document.createElement("div");
+        sizeCell.className = "file-cell";
+        sizeCell.textContent = formatBytes(item.size);
+
+        row.appendChild(nameCell);
+        row.appendChild(ownerCell);
+        row.appendChild(dateCell);
+        row.appendChild(sizeCell);
+        listEl.appendChild(row);
+    });
+}
+
+function buildEmptyRow(message) {
+    const row = document.createElement("div");
+    row.className = "file-row";
+    row.textContent = message;
+    return row;
+}
+
+function iconClassForKey(key) {
+    const lower = key.toLowerCase();
+    if (lower.endsWith(".png") || lower.endsWith(".jpg") || lower.endsWith(".jpeg") || lower.endsWith(".gif")) {
+        return "fa-regular fa-image";
+    }
+    if (lower.endsWith(".zip")) {
+        return "fa-solid fa-box-archive";
+    }
+    if (lower.endsWith(".pdf")) {
+        return "fa-regular fa-file-pdf";
+    }
+    if (lower.endsWith(".doc") || lower.endsWith(".docx")) {
+        return "fa-regular fa-file-word";
+    }
+    if (lower.endsWith(".txt") || lower.endsWith(".md")) {
+        return "fa-regular fa-file-lines";
+    }
+    return "fa-regular fa-file";
+}
+
+function formatBytes(bytes) {
+    if (!Number.isFinite(bytes) || bytes <= 0) {
+        return "0 B";
+    }
+    const units = ["B", "KB", "MB", "GB", "TB"];
+    let size = bytes;
+    let unitIndex = 0;
+    while (size >= 1024 && unitIndex < units.length - 1) {
+        size /= 1024;
+        unitIndex += 1;
+    }
+    const value = size >= 10 || unitIndex === 0 ? Math.round(size) : Math.round(size * 10) / 10;
+    return `${value} ${units[unitIndex]}`;
+}
+
+function formatDate(iso) {
+    if (!iso) {
+        return "-";
+    }
+    const date = new Date(iso);
+    if (Number.isNaN(date.getTime())) {
+        return iso;
+    }
+    return date.toLocaleString();
+}
+
+let awsSdkLoadPromise = null;
+function loadAwsSdk() {
+    if (window.AWS) {
+        return Promise.resolve();
+    }
+    if (awsSdkLoadPromise) {
+        return awsSdkLoadPromise;
+    }
+    awsSdkLoadPromise = new Promise((resolve, reject) => {
+        const script = document.createElement("script");
+        script.src = CONFIG.awsSdkUrl;
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Failed to load AWS SDK."));
+        document.head.appendChild(script);
+    });
+    return awsSdkLoadPromise;
+}
+
+window.addEventListener("DOMContentLoaded", main);
