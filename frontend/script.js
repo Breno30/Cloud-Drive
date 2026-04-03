@@ -316,10 +316,6 @@ function renderFileList(items) {
         nameCell.appendChild(icon);
         nameCell.appendChild(meta);
 
-        const ownerCell = document.createElement("div");
-        ownerCell.className = "file-cell";
-        ownerCell.textContent = "You";
-
         const dateCell = document.createElement("div");
         dateCell.className = "file-cell";
         dateCell.textContent = formatDate(item.lastModified);
@@ -333,7 +329,6 @@ function renderFileList(items) {
         });
 
         row.appendChild(nameCell);
-        row.appendChild(ownerCell);
         row.appendChild(dateCell);
         row.appendChild(sizeCell);
         listEl.appendChild(row);
