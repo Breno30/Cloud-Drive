@@ -1,84 +1,101 @@
+const DOM = {
+    fileList: "file-list",
+    fileSubtitle: "file-subtitle"
+};
+
+window.addEventListener("DOMContentLoaded", () => {
+    main().catch((error) => console.error(error));
+});
+
 async function main() {
-    try {
-        const params = new URLSearchParams(window.location.search);
-        const code = params.get("code");
+    const params = new URLSearchParams(window.location.search);
+    const code = params.get("code");
 
-        console.log(code);
+    const tokenResult = await getTokens(code);
+    console.log(tokenResult);
 
-        let tokenResult = getCachedTokens();
-        if (!tokenResult) {
-            if (!code) {
-                throw new Error("Missing authorization code and no cached tokens.");
-            }
+    const idToken = tokenResult.id_token;
+    const identityId = await getIdentityId(idToken);
+    console.log(identityId);
 
-            const myHeaders = new Headers();
-            myHeaders.append("Content-Type", "application/x-www-form-urlencoded");
+    const credentials = await getCredentials(identityId, idToken);
+    console.log(credentials);
 
-            const urlencoded = new URLSearchParams();
-            urlencoded.append("grant_type", "authorization_code");
-            urlencoded.append("client_id", CONFIG.clientId);
-            urlencoded.append("code", code);
-            urlencoded.append("redirect_uri", CONFIG.redirectUri);
+    await listFiles({ credentials, identityId });
+}
 
-            const tokenResponse = await fetch(CONFIG.tokenUrl, {
-                method: "POST",
-                headers: myHeaders,
-                body: urlencoded,
-                redirect: "follow"
-            });
-
-            tokenResult = await parseJsonResponse(tokenResponse, "token");
-            cacheTokens(tokenResult);
-        }
-
-        console.log(tokenResult);
-
-        const idToken = tokenResult.id_token;
-
-        const myHeaders = new Headers();
-        myHeaders.append("Content-Type", "application/x-amz-json-1.1");
-        myHeaders.append("X-Amz-Target", "AWSCognitoIdentityService.GetId");
-
-        const getIdResponse = await fetch(CONFIG.identityUrl, {
-            method: "POST",
-            headers: myHeaders,
-            body: JSON.stringify({
-                IdentityPoolId: CONFIG.identityPoolId,
-                Logins: {
-                    [`cognito-idp.us-east-1.amazonaws.com/${CONFIG.userPoolId}`]: idToken
-                }
-            }),
-            redirect: "follow"
-        });
-
-        const getIdResult = await parseJsonResponse(getIdResponse, "get-id");
-        console.log(getIdResult);
-
-        const identityId = getIdResult.IdentityId;
-        console.log(identityId);
-
-        const credsResponse = await fetch(CONFIG.identityUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/x-amz-json-1.1",
-                "X-Amz-Target": "AWSCognitoIdentityService.GetCredentialsForIdentity"
-            },
-            body: JSON.stringify({
-                IdentityId: identityId,
-                Logins: {
-                    [`cognito-idp.us-east-1.amazonaws.com/${CONFIG.userPoolId}`]: idToken
-                }
-            }),
-            redirect: "follow"
-        });
-
-        const credsResult = await parseJsonResponse(credsResponse, "get-creds");
-        console.log(credsResult);
-
-        await listFiles(credsResult.Credentials, identityId);
-    } catch (error) {
-        console.error(error);
+async function getTokens(code) {
+    const cached = getCachedTokens();
+    if (cached) {
+        return cached;
     }
+    if (!code) {
+        throw new Error("Missing authorization code and no cached tokens.");
+    }
+
+    const headers = new Headers();
+    headers.append("Content-Type", "application/x-www-form-urlencoded");
+
+    const urlencoded = new URLSearchParams();
+    urlencoded.append("grant_type", "authorization_code");
+    urlencoded.append("client_id", CONFIG.clientId);
+    urlencoded.append("code", code);
+    urlencoded.append("redirect_uri", CONFIG.redirectUri);
+
+    const response = await fetch(CONFIG.tokenUrl, {
+        method: "POST",
+        headers,
+        body: urlencoded,
+        redirect: "follow"
+    });
+
+    const result = await parseJsonResponse(response, "token");
+    cacheTokens(result);
+    return result;
+}
+
+async function getIdentityId(idToken) {
+    const response = await fetch(CONFIG.identityUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "AWSCognitoIdentityService.GetId"
+        },
+        body: JSON.stringify({
+            IdentityPoolId: CONFIG.identityPoolId,
+            Logins: {
+                [cognitoLoginKey()]: idToken
+            }
+        }),
+        redirect: "follow"
+    });
+
+    const result = await parseJsonResponse(response, "get-id");
+    return result.IdentityId;
+}
+
+async function getCredentials(identityId, idToken) {
+    const response = await fetch(CONFIG.identityUrl, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-amz-json-1.1",
+            "X-Amz-Target": "AWSCognitoIdentityService.GetCredentialsForIdentity"
+        },
+        body: JSON.stringify({
+            IdentityId: identityId,
+            Logins: {
+                [cognitoLoginKey()]: idToken
+            }
+        }),
+        redirect: "follow"
+    });
+
+    const result = await parseJsonResponse(response, "get-creds");
+    return result.Credentials;
+}
+
+function cognitoLoginKey() {
+    return `cognito-idp.${CONFIG.region}.amazonaws.com/${CONFIG.userPoolId}`;
 }
 
 async function parseJsonResponse(response, label) {
@@ -144,7 +161,7 @@ function parseJwt(jwt) {
     }
 }
 
-async function listFiles(credentials, identityId) {
+async function listFiles({ credentials, identityId }) {
     if (CONFIG.bucket && CONFIG.region && credentials) {
         await listFilesWithCredentials(credentials, identityId);
         return;
@@ -170,7 +187,7 @@ async function listFilesWithCredentials(credentials, identityId) {
     const response = await s3
         .listObjectsV2({
             Bucket: CONFIG.bucket,
-            Prefix: `${CONFIG.listPrefix}/${identityId}`
+            Prefix: buildUserPrefix(identityId)
         })
         .promise();
 
@@ -196,6 +213,14 @@ async function listFilesWithPresignedUrl(url) {
     renderFileList(items);
 }
 
+function buildUserPrefix(identityId) {
+    const base = (CONFIG.listPrefixBase || "users/").replace(/\/?$/, "/");
+    if (!identityId) {
+        return base;
+    }
+    return `${base}${identityId}/`;
+}
+
 function parseS3ListXml(xmlText) {
     const parser = new DOMParser();
     const xml = parser.parseFromString(xmlText, "application/xml");
@@ -215,13 +240,13 @@ function getXmlText(parent, tagName) {
 }
 
 function renderFileList(items) {
-    const listEl = document.getElementById("file-list");
+    const listEl = document.getElementById(DOM.fileList);
     if (!listEl) {
         return;
     }
     listEl.innerHTML = "";
 
-    const subtitle = document.getElementById("file-subtitle");
+    const subtitle = document.getElementById(DOM.fileSubtitle);
     if (subtitle) {
         subtitle.textContent = "Live data · S3 list";
     }
@@ -349,5 +374,3 @@ function loadAwsSdk() {
     });
     return awsSdkLoadPromise;
 }
-
-window.addEventListener("DOMContentLoaded", main);
