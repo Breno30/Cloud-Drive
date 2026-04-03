@@ -13,6 +13,7 @@ async function main() {
 
     const tokenResult = await getTokens(code);
     const idToken = tokenResult.id_token;
+    renderUserFromToken(idToken);
     const identityId = await getIdentityId(idToken);
     const credentials = await getCredentials(identityId, idToken);
 
@@ -158,6 +159,52 @@ function parseJwt(jwt) {
     } catch {
         return null;
     }
+}
+
+function renderUserFromToken(idToken) {
+    const claims = parseJwt(idToken);
+    if (!claims) {
+        return;
+    }
+
+    const name =
+        claims.name ||
+        [claims.given_name, claims.family_name].filter(Boolean).join(" ") ||
+        claims.preferred_username ||
+        claims["cognito:username"] ||
+        claims.email ||
+        "User";
+    const email = claims.email || claims["cognito:username"] || "";
+
+    const nameEl = document.getElementById("user-name");
+    if (nameEl) {
+        nameEl.textContent = name;
+    }
+
+    const emailEl = document.getElementById("user-email");
+    if (emailEl) {
+        emailEl.textContent = email || "-";
+    }
+
+    const avatarEl = document.getElementById("user-avatar");
+    if (avatarEl) {
+        avatarEl.textContent = initialsForUser(name || email);
+    }
+}
+
+function initialsForUser(value) {
+    if (!value) {
+        return "--";
+    }
+    const base = value.includes("@") ? value.split("@")[0] : value;
+    const parts = base.trim().split(/\s+/).filter(Boolean);
+    if (!parts.length) {
+        return "--";
+    }
+    if (parts.length === 1) {
+        return parts[0].slice(0, 2).toUpperCase();
+    }
+    return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase();
 }
 
 async function listFiles({ credentials, identityId }) {
