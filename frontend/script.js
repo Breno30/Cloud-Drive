@@ -264,12 +264,8 @@ function renderFileList(items) {
     name.className = "file-name";
     name.textContent = filenameFromKey(item.key);
 
-        const sub = document.createElement("div");
-        sub.className = "file-sub";
-        sub.textContent = item.key;
 
         meta.appendChild(name);
-        meta.appendChild(sub);
         nameCell.appendChild(icon);
         nameCell.appendChild(meta);
 
