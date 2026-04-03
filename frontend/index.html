@@ -8,8 +8,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
     integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA=="
     crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <script src="./config.js"></script>
-    <script src="./script.js?version=3"></script>
+  <script src="./config.js"></script>
+  <script src="./script.js?version=56656555545"></script>
   <style>
     :root {
       --bg: #020617;
@@ -53,8 +53,6 @@
     }
 
     .shell {
-      display: grid;
-      grid-template-columns: 260px minmax(0, 1fr);
       gap: 16px;
       width: 100%;
       max-width: 1440px;
@@ -63,6 +61,7 @@
     }
 
     .panel {
+      padding: 1.5rem;
       background: var(--bg-elevated);
       border-radius: 16px;
       border: 1px solid var(--border-subtle);
@@ -73,14 +72,15 @@
     }
 
     .sidebar {
-      padding: 16px 14px 14px;
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 1rem;
     }
 
     .sidebar-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
     }
 
     .logo {
@@ -129,6 +129,30 @@
       font-size: 12px;
       font-weight: 600;
       color: var(--text-soft);
+    }
+
+    .user-meta {
+      margin: 8px 6px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .user-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-email {
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .sidebar-actions {
@@ -251,7 +275,6 @@
 
     .sidebar-footer {
       margin-top: auto;
-      padding-top: 18px;
       border-top: 1px solid rgba(15, 23, 42, 0.96);
     }
 
@@ -409,11 +432,10 @@
     }
 
     .main-header {
-      padding: 12px 16px 8px;
+      padding: 12px 0px;
       display: flex;
       align-items: center;
       gap: 12px;
-      border-bottom: 1px solid rgba(15, 23, 42, 0.95);
       background: #020617;
     }
 
@@ -527,11 +549,10 @@
     }
 
     .main-toolbar {
-      padding: 8px 16px 10px;
+      padding: 12px 0px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(15, 23, 42, 0.95);
       background: #020617;
     }
 
@@ -585,7 +606,6 @@
       flex: 1;
       display: flex;
       flex-direction: column;
-      padding: 12px 16px 14px;
       background: #020617;
     }
 
@@ -969,16 +989,9 @@
     }
 
     @media (max-width: 640px) {
-      body {
-        padding: 6px;
-      }
-
-      .panel {
-        border-radius: 18px;
-      }
 
       .sidebar {
-        display: none;
+        grid-template-columns: auto;
       }
 
       .shell {
@@ -989,8 +1002,8 @@
 </head>
 
 <body>
-  <div class="shell">
-    <aside class="panel sidebar">
+  <div class="panel shell">
+    <aside class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
           <div class="logo-mark">
@@ -998,43 +1011,9 @@
           </div>
           <div>
             <div class="logo-text">CloudDrive</div>
-            <div class="logo-sub">Personal cloud</div>
+            <div class="logo-sub" id="user-email">Personal cloud</div>
           </div>
         </div>
-        <div class="user-pic">AW</div>
-      </div>
-
-      <div class="sidebar-actions">
-        <button class="btn-primary" type="button">
-          <span class="icon"><i class="fa-solid fa-plus"></i></span>
-          <span>New</span>
-        </button>
-      </div>
-
-      <div class="nav-section">
-        <div class="nav-section-label">Views</div>
-        <ul class="nav-list">
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="icon"><i class="fa-regular fa-file-lines"></i></span>
-              <span class="label">Documents</span>
-              <span class="badge">24</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="icon"><i class="fa-regular fa-image"></i></span>
-              <span class="label">Media</span>
-              <span class="badge">9</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a href="#" class="nav-link">
-              <span class="icon"><i class="fa-solid fa-gear"></i></span>
-              <span class="label">Settings</span>
-            </a>
-          </li>
-        </ul>
       </div>
 
       <div class="sidebar-footer">
@@ -1061,22 +1040,13 @@
       </div>
     </aside>
 
-    <main class="panel main">
+    <main class="main">
       <div class="main-header">
         <div class="search-shell">
           <div class="search-input-wrapper">
             <span class="icon"><i class="fa-solid fa-magnifying-glass"></i></span>
             <input type="search" placeholder="Search in CloudDrive" aria-label="Search in CloudDrive" />
           </div>
-        </div>
-
-        <div class="view-toggles">
-          <button class="icon-button active" type="button" aria-label="List">
-            <i class="fa-solid fa-list"></i>
-          </button>
-          <button class="icon-button" type="button" aria-label="Grid">
-            <i class="fa-solid fa-grip"></i>
-          </button>
         </div>
 
       </div>
@@ -1093,26 +1063,12 @@
             <span>Upload</span>
           </button>
           <input type="file" id="upload-input" style="display: none;" />
-          <button class="pill-button" type="button">
-            <span class="icon"><i class="fa-solid fa-arrow-up-wide-short"></i></span>
-            <span>Sort</span>
-          </button>
-          <button class="pill-button primary" type="button">
-            <span class="icon"><i class="fa-solid fa-folder-plus"></i></span>
-            <span>New folder</span>
-          </button>
         </div>
       </div>
 
       <div class="main-body">
         <div class="main-grid">
           <section class="card">
-            <div class="card-header">
-              <div class="card-title-row">
-                <div class="card-title">Files</div>
-                <div class="card-subtitle" id="file-subtitle">Mocked data · Sample view</div>
-              </div>
-            </div>
 
             <div class="file-header-row">
               <div>Name</div>
