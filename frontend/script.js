@@ -1,10 +1,3 @@
-const DOM = {
-    fileList: "file-list",
-    fileSubtitle: "file-subtitle",
-    uploadButton: "upload-button",
-    uploadInput: "upload-input"
-};
-
 const STATE = {
     credentials: null,
     identityId: null
@@ -19,14 +12,9 @@ async function main() {
     const code = params.get("code");
 
     const tokenResult = await getTokens(code);
-    console.log(tokenResult);
-
     const idToken = tokenResult.id_token;
     const identityId = await getIdentityId(idToken);
-    console.log(identityId);
-
     const credentials = await getCredentials(identityId, idToken);
-    console.log(credentials);
 
     STATE.credentials = credentials;
     STATE.identityId = identityId;
@@ -185,16 +173,7 @@ async function listFiles({ credentials, identityId }) {
 async function listFilesWithCredentials(credentials, identityId) {
     await loadAwsSdk();
 
-    window.AWS.config.update({
-        region: CONFIG.region,
-        credentials: new window.AWS.Credentials(
-            credentials.AccessKeyId,
-            credentials.SecretKey,
-            credentials.SessionToken
-        )
-    });
-
-    const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+    const s3 = createS3Client(credentials);
     const response = await s3
         .listObjectsV2({
             Bucket: CONFIG.bucket,
@@ -251,13 +230,13 @@ function getXmlText(parent, tagName) {
 }
 
 function renderFileList(items) {
-    const listEl = document.getElementById(DOM.fileList);
+    const listEl = document.getElementById("file-list");
     if (!listEl) {
         return;
     }
     listEl.innerHTML = "";
 
-    const subtitle = document.getElementById(DOM.fileSubtitle);
+    const subtitle = document.getElementById("file-subtitle");
     if (subtitle) {
         subtitle.textContent = "Live data · S3 list";
     }
@@ -281,9 +260,9 @@ function renderFileList(items) {
         const meta = document.createElement("div");
         meta.className = "file-meta";
 
-        const name = document.createElement("div");
-        name.className = "file-name";
-        name.textContent = item.key.split("/").pop() || item.key;
+    const name = document.createElement("div");
+    name.className = "file-name";
+    name.textContent = filenameFromKey(item.key);
 
         const sub = document.createElement("div");
         sub.className = "file-sub";
@@ -319,8 +298,8 @@ function renderFileList(items) {
 }
 
 function setupUpload() {
-    const button = document.getElementById(DOM.uploadButton);
-    const input = document.getElementById(DOM.uploadInput);
+    const button = document.getElementById("upload-button");
+    const input = document.getElementById("upload-input");
     if (!button || !input) {
         return;
     }
@@ -330,9 +309,7 @@ function setupUpload() {
     });
 
     input.addEventListener("change", async () => {
-        console.log(input)
         const file = input.files && input.files[0];
-        console.log(file)
         if (!file) {
             return;
         }
@@ -347,23 +324,13 @@ function setupUpload() {
 }
 
 async function uploadFile(file) {
-    console.log(file)
     if (!STATE.credentials || !STATE.identityId) {
         throw new Error("Missing credentials or identityId for upload.");
     }
 
     await loadAwsSdk();
 
-    window.AWS.config.update({
-        region: CONFIG.region,
-        credentials: new window.AWS.Credentials(
-            STATE.credentials.AccessKeyId,
-            STATE.credentials.SecretKey,
-            STATE.credentials.SessionToken
-        )
-    });
-
-    const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+    const s3 = createS3Client(STATE.credentials);
     const key = `${buildUserPrefix(STATE.identityId)}${file.name}`;
 
     await s3
@@ -384,15 +351,7 @@ async function downloadFile(key) {
     let url = "";
     if (STATE.credentials && STATE.identityId && CONFIG.bucket && CONFIG.region) {
         await loadAwsSdk();
-        window.AWS.config.update({
-            region: CONFIG.region,
-            credentials: new window.AWS.Credentials(
-                STATE.credentials.AccessKeyId,
-                STATE.credentials.SecretKey,
-                STATE.credentials.SessionToken
-            )
-        });
-        const s3 = new window.AWS.S3({ apiVersion: "2006-03-01" });
+        const s3 = createS3Client(STATE.credentials);
         url = s3.getSignedUrl("getObject", {
             Bucket: CONFIG.bucket,
             Key: key,
@@ -404,7 +363,7 @@ async function downloadFile(key) {
 }
 
 async function triggerBrowserDownload(url, key) {
-    const filename = key.split("/").pop() || "download";
+    const filename = filenameFromKey(key) || "download";
     try {
         const response = await fetch(url, { method: "GET" });
         if (!response.ok) {
@@ -435,6 +394,22 @@ async function triggerBrowserDownload(url, key) {
 
 function encodeS3Key(key) {
     return encodeURIComponent(key).replace(/%2F/g, "/");
+}
+
+function filenameFromKey(key) {
+    return key.split("/").pop() || key;
+}
+
+function createS3Client(credentials) {
+    window.AWS.config.update({
+        region: CONFIG.region,
+        credentials: new window.AWS.Credentials(
+            credentials.AccessKeyId,
+            credentials.SecretKey,
+            credentials.SessionToken
+        )
+    });
+    return new window.AWS.S3({ apiVersion: "2006-03-01" });
 }
 
 function buildEmptyRow(message) {
