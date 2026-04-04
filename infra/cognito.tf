@@ -17,6 +17,10 @@ provider "aws" {
 
 resource "aws_cognito_user_pool" "user_pool" {
   name = "app-user-pool"
+
+  # Use email as the only sign-in identifier.
+  username_attributes      = ["email"]
+  auto_verified_attributes = ["email"]
 }
 
 resource "aws_cognito_user_pool_client" "spa_client" {
