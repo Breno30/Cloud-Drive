@@ -126,3 +126,15 @@ resource "random_id" "bucket_suffix" {
 resource "aws_s3_bucket" "cloud_drive" {
   bucket = "cloud-drive-${random_id.bucket_suffix.hex}"
 }
+
+resource "aws_s3_bucket_cors_configuration" "cloud_drive" {
+  bucket = aws_s3_bucket.cloud_drive.id
+
+  cors_rule {
+    allowed_origins = ["https://local-drive.brenodonascimento.com"]
+    allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
+    allowed_headers = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
