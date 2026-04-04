@@ -349,20 +349,26 @@ function renderFileList(items) {
 
         const dateCell = document.createElement("div");
         dateCell.className = "file-cell";
-        dateCell.textContent = formatDate(item.lastModified);
+        dateCell.innerHTML = `<span class="file-label">Modified</span>${formatDate(
+            item.lastModified
+        )}`;
 
         const sizeCell = document.createElement("div");
         sizeCell.className = "file-cell";
-        sizeCell.textContent = formatBytes(item.size);
+        sizeCell.innerHTML = `<span class="file-label">Size</span>${formatBytes(item.size)}`;
 
         const downloadCell = document.createElement("div");
         downloadCell.className = "file-actions";
+        const downloadLabel = document.createElement("span");
+        downloadLabel.className = "file-label";
+        downloadLabel.textContent = "Download";
+        downloadCell.appendChild(downloadLabel);
         const downloadButton = document.createElement("button");
         downloadButton.type = "button";
         downloadButton.className = "tiny-icon primary";
         downloadButton.title = "Download";
         downloadButton.setAttribute("aria-label", "Download");
-        downloadButton.innerHTML = `<i class="fa-solid fa-download"></i>`;
+        downloadButton.innerHTML = `<i class="fa-solid fa-download"></i><span class="button-text">Download</span>`;
         downloadButton.addEventListener("click", (event) => {
             event.stopPropagation();
             downloadFile(item.key).catch((error) => console.error(error));
@@ -371,12 +377,16 @@ function renderFileList(items) {
 
         const deleteCell = document.createElement("div");
         deleteCell.className = "file-actions";
+        const deleteLabel = document.createElement("span");
+        deleteLabel.className = "file-label";
+        deleteLabel.textContent = "Delete";
+        deleteCell.appendChild(deleteLabel);
         const deleteButton = document.createElement("button");
         deleteButton.type = "button";
         deleteButton.className = "tiny-icon danger";
         deleteButton.title = "Delete";
         deleteButton.setAttribute("aria-label", "Delete");
-        deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+        deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i><span class="button-text">Delete</span>`;
         deleteButton.addEventListener("click", async (event) => {
             event.stopPropagation();
             try {

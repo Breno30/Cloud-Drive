@@ -117,6 +117,7 @@
       text-transform: uppercase;
       letter-spacing: 0.14em;
       color: var(--muted);
+      word-break: break-word;
     }
 
     .user-pic {
@@ -764,6 +765,15 @@
       color: var(--text-soft);
     }
 
+    .file-label {
+      display: none;
+      font-size: 0.625rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-right: 6px;
+    }
+
     .file-actions {
       justify-self: flex-end;
       display: inline-flex;
@@ -790,6 +800,13 @@
       cursor: pointer;
       padding: 0;
       line-height: 1;
+      gap: 6px;
+    }
+
+    .tiny-icon .button-text {
+      display: none;
+      font-size: 0.75rem;
+      letter-spacing: 0.02em;
     }
 
     .tiny-icon.primary {
@@ -1030,6 +1047,45 @@
 
       .shell {
         grid-template-columns: minmax(0, 1fr);
+      }
+
+      .file-header-row {
+        display: none;
+      }
+
+      .file-row {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 8px;
+        padding: 10px 12px;
+      }
+
+      .file-cell,
+      .file-actions {
+        justify-self: flex-start;
+        margin: 0;
+      }
+
+      .file-actions .file-label {
+        display: none;
+      }
+
+      .file-label {
+        display: inline-block;
+      }
+
+      .tiny-icon {
+        width: auto;
+        height: auto;
+        padding: 6px 10px;
+        font-size: 0.75rem;
+      }
+
+      .tiny-icon i {
+        display: none;
+      }
+
+      .tiny-icon .button-text {
+        display: inline;
       }
     }
   </style>
