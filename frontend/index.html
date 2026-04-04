@@ -87,7 +87,7 @@
     .logo {
       display: inline-flex;
       align-items: center;
-      gap: 8px;
+      gap: 2em;
     }
 
     .logo-mark {
@@ -154,6 +154,13 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+    }
+
+
+    .sidebar-logout {
+      width: 100%;
+      justify-content: center;
+      margin-top: 10px;
     }
 
     .sidebar-actions {
@@ -602,6 +609,12 @@
       box-shadow: 0 12px 24px rgba(15, 23, 42, 0.96);
     }
 
+    .pill-button.ghost {
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.7);
+      background: rgba(127, 29, 29, 0.2);
+    }
+
     .main-body {
       position: relative;
       flex: 1;
@@ -1033,6 +1046,10 @@
           <div>
             <div class="logo-text">CloudDrive</div>
             <div class="logo-sub" id="user-email">Personal cloud</div>
+            <button class="pill-button ghost sidebar-logout" type="button" id="logout-button">
+              <span class="icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
+              <span>Logout</span>
+            </button>
           </div>
         </div>
       </div>

@@ -21,6 +21,7 @@ async function main() {
     STATE.credentials = credentials;
     STATE.identityId = identityId;
 
+    setupLogout();
     setupUpload();
     setupSearch();
     await listFiles({ credentials, identityId });
@@ -447,6 +448,28 @@ function setupUpload() {
         } catch (error) {
             console.error(error);
         }
+    });
+}
+
+function setupLogout() {
+    const button = document.getElementById("logout-button");
+    if (!button) {
+        return;
+    }
+    button.addEventListener("click", () => {
+        if (CONFIG.useSessionStorage) {
+            sessionStorage.removeItem("authTokens");
+        }
+        STATE.credentials = null;
+        STATE.identityId = null;
+        const loginUrl = buildLoginUrl();
+        if (loginUrl) {
+            window.location.replace(loginUrl);
+            return;
+        }
+        const cleanUrl = new URL(window.location.href);
+        cleanUrl.searchParams.delete("code");
+        window.location.replace(cleanUrl.toString());
     });
 }
 
