@@ -1,6 +1,7 @@
 const STATE = {
     credentials: null,
-    identityId: null
+    identityId: null,
+    files: []
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -21,6 +22,7 @@ async function main() {
     STATE.identityId = identityId;
 
     setupUpload();
+    setupSearch();
     await listFiles({ credentials, identityId });
 }
 
@@ -262,6 +264,7 @@ async function listFilesWithCredentials(credentials, identityId) {
         }))
         .filter((item) => item.key && !item.key.endsWith("/"));
 
+    STATE.files = items;
     renderFileList(items);
 }
 
@@ -273,6 +276,7 @@ async function listFilesWithPresignedUrl(url) {
 
     const xmlText = await listResponse.text();
     const items = parseS3ListXml(xmlText);
+    STATE.files = items;
     renderFileList(items);
 }
 
@@ -399,6 +403,24 @@ function renderFileList(items) {
         row.appendChild(downloadCell);
         row.appendChild(deleteCell);
         listEl.appendChild(row);
+    });
+}
+
+function setupSearch() {
+    const input = document.getElementById("search-input");
+    if (!input) {
+        return;
+    }
+    input.addEventListener("input", () => {
+        const query = input.value.trim().toLowerCase();
+        if (!query) {
+            renderFileList(STATE.files);
+            return;
+        }
+        const filtered = STATE.files.filter((item) =>
+            filenameFromKey(item.key).toLowerCase().includes(query)
+        );
+        renderFileList(filtered);
     });
 }
 
