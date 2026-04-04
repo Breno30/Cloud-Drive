@@ -1122,13 +1122,14 @@
           </div>
           <div class="storage-meters">
             <div class="meter-track">
-              <div class="meter-fill" style="width: 46%"></div>
+              <div class="meter-fill" id="storage-meter-fill" style="width: 0%"></div>
             </div>
           </div>
           <div class="storage-legend">
             <span class="label"><span class="sub">Used</span> ·
-              <span class="value">4.6 GB / 10 GB</span></span>
-            <span class="sub">≈ 54%</span>
+              <span class="value" id="storage-used">0 B</span> /
+              <span class="value" id="storage-total">10 MB</span></span>
+            <span class="sub" id="storage-percent">≈ 0%</span>
           </div>
         </div>
       </div>

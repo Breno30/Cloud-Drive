@@ -11,5 +11,6 @@ const CONFIG = {
     listPrefixBase: "users",
     listUrl: "",
     awsSdkUrl: "https://sdk.amazonaws.com/js/aws-sdk-2.1571.0.min.js",
-    useSessionStorage: true
+    useSessionStorage: true,
+    storageQuotaBytes: 10 * 1024 * 1024
 };
