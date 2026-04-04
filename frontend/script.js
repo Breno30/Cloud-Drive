@@ -350,12 +350,44 @@ function renderFileList(items) {
         sizeCell.className = "file-cell";
         sizeCell.textContent = formatBytes(item.size);
 
-        const actionsCell = document.createElement("div");
-        actionsCell.className = "file-actions";
-        const downloadIcon = document.createElement("span");
-        downloadIcon.title = "Download";
-        downloadIcon.innerHTML = `<i class="fa-solid fa-download"></i>`;
-        actionsCell.appendChild(downloadIcon);
+        const downloadCell = document.createElement("div");
+        downloadCell.className = "file-actions";
+        const downloadButton = document.createElement("button");
+        downloadButton.type = "button";
+        downloadButton.className = "tiny-icon primary";
+        downloadButton.title = "Download";
+        downloadButton.setAttribute("aria-label", "Download");
+        downloadButton.innerHTML = `<i class="fa-solid fa-download"></i>`;
+        downloadButton.addEventListener("click", (event) => {
+            event.stopPropagation();
+            downloadFile(item.key).catch((error) => console.error(error));
+        });
+        downloadCell.appendChild(downloadButton);
+
+        const deleteCell = document.createElement("div");
+        deleteCell.className = "file-actions";
+        const deleteButton = document.createElement("button");
+        deleteButton.type = "button";
+        deleteButton.className = "tiny-icon danger";
+        deleteButton.title = "Delete";
+        deleteButton.setAttribute("aria-label", "Delete");
+        deleteButton.innerHTML = `<i class="fa-solid fa-trash"></i>`;
+        deleteButton.addEventListener("click", async (event) => {
+            event.stopPropagation();
+            try {
+                const confirmed = window.confirm(
+                    `Delete "${filenameFromKey(item.key)}"? This cannot be undone.`
+                );
+                if (!confirmed) {
+                    return;
+                }
+                await deleteFile(item.key);
+                await listFiles({ credentials: STATE.credentials, identityId: STATE.identityId });
+            } catch (error) {
+                console.error(error);
+            }
+        });
+        deleteCell.appendChild(deleteButton);
 
         row.addEventListener("click", () => {
             downloadFile(item.key).catch((error) => console.error(error));
@@ -364,7 +396,8 @@ function renderFileList(items) {
         row.appendChild(nameCell);
         row.appendChild(dateCell);
         row.appendChild(sizeCell);
-        row.appendChild(actionsCell);
+        row.appendChild(downloadCell);
+        row.appendChild(deleteCell);
         listEl.appendChild(row);
     });
 }
@@ -432,6 +465,23 @@ async function downloadFile(key) {
     }
 
     await triggerBrowserDownload(url, key);
+}
+
+async function deleteFile(key) {
+    if (!key) {
+        return;
+    }
+    if (!STATE.credentials || !STATE.identityId) {
+        throw new Error("Missing credentials or identityId for delete.");
+    }
+    await loadAwsSdk();
+    const s3 = createS3Client(STATE.credentials);
+    await s3
+        .deleteObject({
+            Bucket: CONFIG.bucket,
+            Key: key
+        })
+        .promise();
 }
 
 async function triggerBrowserDownload(url, key) {

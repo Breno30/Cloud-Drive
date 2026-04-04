@@ -671,7 +671,7 @@
 
     .file-header-row {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.8fr;
+      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.6fr 0.6fr;
       gap: 6px;
       padding: 6px 6px;
       border-radius: 8px;
@@ -693,10 +693,9 @@
 
     .file-row {
       display: grid;
-      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.8fr;
+      grid-template-columns: minmax(0, 3fr) 1.1fr 1.1fr 0.6fr 0.6fr;
       gap: 6px;
       padding: 6px 6px;
-      font-size: 0.875rem;
       align-items: center;
       cursor: pointer;
       position: relative;
@@ -756,7 +755,7 @@
       justify-self: flex-end;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 6px;
       margin: 0 auto;
     }
 
@@ -775,6 +774,9 @@
       font-size: 0.688rem;
       color: var(--muted);
       background: rgba(15, 23, 42, 0.96);
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
     }
 
     .tiny-icon.primary {
@@ -783,6 +785,19 @@
           rgba(59, 130, 246, 0.9),
           rgba(37, 99, 235, 0.98));
       border-color: rgba(191, 219, 254, 0.8);
+    }
+
+    .tiny-icon.danger {
+      color: #fee2e2;
+      background: radial-gradient(circle at 0 0,
+          rgba(248, 113, 113, 0.92),
+          rgba(239, 68, 68, 0.98));
+      border-color: rgba(254, 202, 202, 0.8);
+    }
+
+    .tiny-icon:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
     }
 
     .empty-hint {
@@ -1081,6 +1096,7 @@
               <div>Last modified</div>
               <div>Size</div>
               <div class="file-actions-header">Download</div>
+              <div class="file-actions-header">Delete</div>
             </div>
 
             <div class="file-list" id="file-list"></div>
