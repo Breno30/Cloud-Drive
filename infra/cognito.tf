@@ -32,8 +32,8 @@ resource "aws_cognito_user_pool_client" "spa_client" {
   allowed_oauth_scopes                 = ["openid", "email", "profile"]
   supported_identity_providers         = ["COGNITO"]
 
-  callback_urls = ["https://d84l1y8p4kdic.cloudfront.net/"]
-  logout_urls   = ["https://d84l1y8p4kdic.cloudfront.net/"]
+  callback_urls = ["https://local-drive.brenodonascimento.com/"]
+  logout_urls   = ["https://local-drive.brenodonascimento.com/"]
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
