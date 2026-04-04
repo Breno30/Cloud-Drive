@@ -267,6 +267,7 @@ async function listFilesWithCredentials(credentials, identityId) {
 
     STATE.files = items;
     renderFileList(items);
+    updateStorageUsage(items);
 }
 
 async function listFilesWithPresignedUrl(url) {
@@ -279,6 +280,7 @@ async function listFilesWithPresignedUrl(url) {
     const items = parseS3ListXml(xmlText);
     STATE.files = items;
     renderFileList(items);
+    updateStorageUsage(items);
 }
 
 function buildUserPrefix(identityId) {
@@ -433,6 +435,30 @@ function setupSearch() {
         );
         renderFileList(filtered);
     });
+}
+
+function updateStorageUsage(items) {
+    const fillEl = document.getElementById("storage-meter-fill");
+    const usedEl = document.getElementById("storage-used");
+    const totalEl = document.getElementById("storage-total");
+    const percentEl = document.getElementById("storage-percent");
+    if (!fillEl || !usedEl || !totalEl || !percentEl) {
+        return;
+    }
+    const totalBytes = Array.isArray(items)
+        ? items.reduce((sum, item) => sum + (Number(item.size) || 0), 0)
+        : 0;
+    const quotaBytes =
+        Number.isFinite(Number(CONFIG.storageQuotaBytes)) && Number(CONFIG.storageQuotaBytes) > 0
+            ? Number(CONFIG.storageQuotaBytes)
+            : 10 * 1024 * 1024 * 1024;
+    const ratio = quotaBytes > 0 ? totalBytes / quotaBytes : 0;
+    const percent = Math.min(100, Math.max(0, Math.round(ratio * 100)));
+
+    fillEl.style.width = `${percent}%`;
+    usedEl.textContent = formatBytes(totalBytes);
+    totalEl.textContent = formatBytes(quotaBytes);
+    percentEl.textContent = `≈ ${percent}%`;
 }
 
 function setupUpload() {
