@@ -30,7 +30,8 @@ async function getTokens(code) {
         return cached;
     }
     if (!code) {
-        throw new Error("Missing authorization code and no cached tokens.");
+        redirectToLogin();
+        return new Promise(() => {});
     }
 
     const headers = new Headers();
@@ -52,6 +53,31 @@ async function getTokens(code) {
     const result = await parseJsonResponse(response, "token");
     cacheTokens(result);
     return result;
+}
+
+function redirectToLogin() {
+    const loginUrl = buildLoginUrl();
+    if (!loginUrl) {
+        throw new Error("Missing authorization code and no login URL configuration.");
+    }
+    window.location.replace(loginUrl);
+}
+
+function buildLoginUrl() {
+    const url = new URL(CONFIG.loginUrl);
+
+    // add /login to the path
+    url.pathname = `${url.pathname.replace(/\/$/, "")}/login`;
+
+    url.searchParams.set("response_type", "code");
+    url.searchParams.set("client_id", CONFIG.clientId);
+    url.searchParams.set("redirect_uri", CONFIG.redirectUri);
+
+    if (!url.searchParams.get("scope")) {
+        url.searchParams.set("scope", CONFIG.scopes || "email openid phone");
+    }
+
+    return url.toString();
 }
 
 async function getIdentityId(idToken) {
