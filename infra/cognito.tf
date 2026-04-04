@@ -33,7 +33,7 @@ resource "aws_cognito_user_pool_client" "spa_client" {
   # Enable Hosted UI / OAuth
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
-  allowed_oauth_scopes                 = ["openid", "email", "profile"]
+  allowed_oauth_scopes                 = ["openid", "email", "phone"]
   supported_identity_providers         = ["COGNITO"]
 
   callback_urls = ["https://local-drive.brenodonascimento.com/"]
