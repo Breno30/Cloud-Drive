@@ -4,6 +4,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 }
 
@@ -73,10 +77,52 @@ resource "aws_iam_role" "identity_pool_authenticated" {
   })
 }
 
+resource "aws_iam_role_policy" "identity_pool_authenticated_s3" {
+  name = "identity-pool-authenticated-s3"
+  role = aws_iam_role.identity_pool_authenticated.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Sid    = "ListOwnPrefix"
+        Effect = "Allow"
+        Action = ["s3:ListBucket"]
+        Resource = aws_s3_bucket.cloud_drive.arn
+        Condition = {
+          StringLike = {
+            "s3:prefix" = [
+              "users/$${cognito-identity.amazonaws.com:sub}/*"
+            ]
+          }
+        }
+      },
+      {
+        Sid    = "ObjectAccessOwnPrefix"
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:PutObject",
+          "s3:DeleteObject"
+        ]
+        Resource = "${aws_s3_bucket.cloud_drive.arn}/users/$${cognito-identity.amazonaws.com:sub}/*"
+      }
+    ]
+  })
+}
+
 resource "aws_cognito_identity_pool_roles_attachment" "identity_pool_roles" {
   identity_pool_id = aws_cognito_identity_pool.identity_pool.id
 
   roles = {
     authenticated = aws_iam_role.identity_pool_authenticated.arn
   }
+}
+
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
+resource "aws_s3_bucket" "cloud_drive" {
+  bucket = "cloud-drive-${random_id.bucket_suffix.hex}"
 }
