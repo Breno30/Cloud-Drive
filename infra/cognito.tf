@@ -15,6 +15,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
+variable "frontend_origin" {
+  type        = string
+  description = "Allowed frontend origin for CORS and OAuth callbacks."
+  default     = "https://local-drive.brenodonascimento.com"
+}
+
 resource "aws_cognito_user_pool" "user_pool" {
   name = "app-user-pool"
 
@@ -36,8 +42,8 @@ resource "aws_cognito_user_pool_client" "spa_client" {
   allowed_oauth_scopes                 = ["openid", "email", "phone"]
   supported_identity_providers         = ["COGNITO"]
 
-  callback_urls = ["https://local-drive.brenodonascimento.com/"]
-  logout_urls   = ["https://local-drive.brenodonascimento.com/"]
+  callback_urls = ["${var.frontend_origin}/"]
+  logout_urls   = ["${var.frontend_origin}/"]
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
@@ -135,7 +141,7 @@ resource "aws_s3_bucket_cors_configuration" "cloud_drive" {
   bucket = aws_s3_bucket.cloud_drive.id
 
   cors_rule {
-    allowed_origins = ["https://local-drive.brenodonascimento.com"]
+    allowed_origins = [var.frontend_origin]
     allowed_methods = ["GET", "PUT", "POST", "DELETE", "HEAD"]
     allowed_headers = ["*"]
     expose_headers  = ["ETag"]
