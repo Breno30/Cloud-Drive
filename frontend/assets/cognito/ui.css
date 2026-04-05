@@ -1,20 +1,20 @@
 .background-customizable {
-  background-color: #020617;
-  box-shadow: 0 0 0 9999px #020617;
+  background-color: #fff;
+  box-shadow: 0 0 0 9999px #fff;
 }
 
 .banner-customizable {
-  background-color: #020617;
+  background-color: #fff;
   padding: 0;
 }
 
 /* Inputs */
 
 .inputField-customizable {
-  background: #020617;
+  background: #fff;
   border: 1px solid #1e40af;
   border-radius: 10px;
-  color: #e5e7eb;
+  color: #3B3B3B;
   padding: 12px;
 }
 
@@ -29,13 +29,13 @@
 /* Labels */
 
 .label-customizable {
-  color: #e5e7eb;
+  color: #3B3B3B;
 }
 
 .textDescription-customizable {
-  color: #e5e7eb;
+  color: #3B3B3B;
 }
 
 .redirect-customizable {
-  color: #e5e7eb;
+  color: #3B3B3B;
 }
