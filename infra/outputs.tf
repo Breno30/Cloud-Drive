@@ -1,9 +1,9 @@
 output "cloud_drive_bucket_name" {
-  value = aws_s3_bucket.cloud_drive.bucket
+  value = module.storage.cloud_drive_bucket_name
 }
 
 output "frontend_bucket_name" {
-  value = aws_s3_bucket.frontend.bucket
+  value = module.storage.frontend_bucket_name
 }
 
 output "frontend_origin" {
@@ -15,9 +15,9 @@ output "frontend_redirect_uri" {
 }
 
 output "frontend_cloudfront_domain" {
-  value = aws_cloudfront_distribution.frontend.domain_name
+  value = module.cdn.domain_name
 }
 
 output "frontend_cloudfront_url" {
-  value = "https://${aws_cloudfront_distribution.frontend.domain_name}/"
+  value = "https://${module.cdn.domain_name}/"
 }

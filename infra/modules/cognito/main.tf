@@ -16,8 +16,8 @@ resource "aws_cognito_user_pool_client" "spa_client" {
   allowed_oauth_scopes                 = ["openid", "email", "phone"]
   supported_identity_providers         = ["COGNITO"]
 
-  callback_urls = [local.frontend_redirect_uri]
-  logout_urls   = [local.frontend_redirect_uri]
+  callback_urls = [var.frontend_redirect_uri]
+  logout_urls   = [var.frontend_redirect_uri]
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
@@ -72,7 +72,7 @@ resource "aws_iam_role_policy" "identity_pool_authenticated_s3" {
         Sid      = "ListOwnPrefix"
         Effect   = "Allow"
         Action   = ["s3:ListBucket"]
-        Resource = aws_s3_bucket.cloud_drive.arn
+        Resource = var.cloud_drive_bucket_arn
         Condition = {
           StringLike = {
             "s3:prefix" = [
@@ -89,7 +89,7 @@ resource "aws_iam_role_policy" "identity_pool_authenticated_s3" {
           "s3:PutObject",
           "s3:DeleteObject"
         ]
-        Resource = "${aws_s3_bucket.cloud_drive.arn}/users/$${cognito-identity.amazonaws.com:sub}/*"
+        Resource = "${var.cloud_drive_bucket_arn}/users/$${cognito-identity.amazonaws.com:sub}/*"
       }
     ]
   })
@@ -101,4 +101,11 @@ resource "aws_cognito_identity_pool_roles_attachment" "identity_pool_roles" {
   roles = {
     authenticated = aws_iam_role.identity_pool_authenticated.arn
   }
+}
+
+resource "aws_cognito_user_pool_ui_customization" "spa" {
+  user_pool_id = aws_cognito_user_pool.user_pool.id
+  client_id    = aws_cognito_user_pool_client.spa_client.id
+  css          = file(var.ui_css_file)
+  image_file   = filebase64(var.ui_logo_file)
 }

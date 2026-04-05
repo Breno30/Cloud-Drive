@@ -1,9 +1,13 @@
+variable "frontend_bucket_website_endpoint" {
+  type = string
+}
+
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
 
   origin {
-    domain_name = aws_s3_bucket.frontend.website_endpoint
+    domain_name = var.frontend_bucket_website_endpoint
     origin_id   = "frontend-website"
 
     custom_origin_config {
@@ -40,6 +44,4 @@ resource "aws_cloudfront_distribution" "frontend" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
-
-  depends_on = [aws_s3_bucket_website_configuration.frontend]
 }
