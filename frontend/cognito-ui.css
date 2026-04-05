@@ -1,0 +1,40 @@
+.background-customizable {
+  background-color: #020617;
+  box-shadow: 0 0 0 9999px #020617;
+}
+
+.banner-customizable {
+  background-color: #020617;
+}
+
+/* Inputs */
+
+.inputField-customizable {
+  background: #020617;
+  border: 1px solid #1e40af;
+  border-radius: 10px;
+  color: #e5e7eb;
+  padding: 12px;
+}
+
+/* Button */
+
+.submitButton-customizable {
+  background: linear-gradient(90deg, #3b82f6, #2563eb);
+  border-radius: 999px;
+  border: none;
+}
+
+/* Labels */
+
+.label-customizable {
+  color: #e5e7eb;
+}
+
+.textDescription-customizable {
+  color: #e5e7eb;
+}
+
+.redirect-customizable {
+  color: #e5e7eb;
+}
