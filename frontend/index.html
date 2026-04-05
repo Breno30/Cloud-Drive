@@ -107,9 +107,12 @@
       background: #e5e7eb;
     }
 
-    .logo-text {
-      font-weight: 600;
-      letter-spacing: 0.03em;
+    .logo-image {
+      display: block;
+      max-width: 100%;
+      max-height: 5rem;
+      height: auto;
+      object-fit: contain;
     }
 
     .logo-sub {
@@ -1074,6 +1077,15 @@
     }
 
     @media (max-width: 640px) {
+      .logo {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .sidebar-header {
+        place-self: center;
+      }
+
       .file-actions button {
         min-width: 10em;
       }
@@ -1137,11 +1149,8 @@
     <aside class="sidebar">
       <div class="sidebar-header">
         <div class="logo">
-          <div class="logo-mark">
-            <div class="logo-mark-inner"></div>
-          </div>
+            <img class="logo-image" src="assets/cognito/logo.png" alt="CloudDrive" />
           <div>
-            <div class="logo-text">CloudDrive</div>
             <div class="logo-sub" id="user-email">Personal cloud</div>
             <button class="pill-button ghost sidebar-logout" type="button" id="logout-button">
               <span class="icon"><i class="fa-solid fa-arrow-right-from-bracket"></i></span>
