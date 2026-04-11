@@ -1,5 +1,20 @@
-variable "frontend_bucket_website_endpoint" {
+variable "frontend_bucket_regional_domain_name" {
   type = string
+}
+
+variable "frontend_bucket_arn" {
+  type = string
+}
+
+variable "frontend_bucket_id" {
+  type = string
+}
+
+resource "aws_cloudfront_origin_access_control" "frontend" {
+  name                              = "cloud-drive-frontend-oac"
+  origin_access_control_origin_type = "s3"
+  signing_behavior                  = "always"
+  signing_protocol                  = "sigv4"
 }
 
 resource "aws_cloudfront_distribution" "frontend" {
@@ -7,19 +22,17 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_root_object = "index.html"
 
   origin {
-    domain_name = var.frontend_bucket_website_endpoint
-    origin_id   = "frontend-website"
+    domain_name              = var.frontend_bucket_regional_domain_name
+    origin_id                = "frontend-s3"
+    origin_access_control_id = aws_cloudfront_origin_access_control.frontend.id
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "http-only"
-      origin_ssl_protocols   = ["TLSv1.2"]
+    s3_origin_config {
+      origin_access_identity = ""
     }
   }
 
   default_cache_behavior {
-    target_origin_id       = "frontend-website"
+    target_origin_id       = "frontend-s3"
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD"]
@@ -44,4 +57,31 @@ resource "aws_cloudfront_distribution" "frontend" {
   viewer_certificate {
     cloudfront_default_certificate = true
   }
+}
+
+data "aws_iam_policy_document" "frontend_bucket_policy" {
+  statement {
+    sid     = "AllowCloudFrontRead"
+    effect  = "Allow"
+    actions = ["s3:GetObject"]
+    resources = [
+      "${var.frontend_bucket_arn}/*"
+    ]
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.frontend.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "frontend" {
+  bucket = var.frontend_bucket_id
+  policy = data.aws_iam_policy_document.frontend_bucket_policy.json
 }
