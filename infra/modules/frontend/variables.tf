@@ -41,3 +41,7 @@ variable "cognito_identity_pool_id" {
 variable "region" {
   type = string
 }
+
+variable "upload_url" {
+  type = string
+}

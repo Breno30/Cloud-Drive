@@ -1,6 +1,7 @@
 const STATE = {
     credentials: null,
     identityId: null,
+    idToken: null,
     files: []
 };
 
@@ -14,6 +15,7 @@ async function main() {
 
     const tokenResult = await getTokens(code);
     const idToken = tokenResult.id_token;
+    STATE.idToken = idToken;
     renderUserFromToken(idToken);
     const identityId = await getIdentityId(idToken);
     const credentials = await getCredentials(identityId, idToken);
@@ -498,6 +500,7 @@ function setupLogout() {
         }
         STATE.credentials = null;
         STATE.identityId = null;
+        STATE.idToken = null;
         const loginUrl = buildLoginUrl();
         if (loginUrl) {
             window.location.replace(loginUrl);
@@ -510,6 +513,11 @@ function setupLogout() {
 }
 
 async function uploadFile(file) {
+    if (CONFIG.uploadUrl) {
+        await uploadViaLambda(file);
+        return;
+    }
+
     if (!STATE.credentials || !STATE.identityId) {
         throw new Error("Missing credentials or identityId for upload.");
     }
@@ -527,6 +535,30 @@ async function uploadFile(file) {
             ContentType: file.type || "application/octet-stream"
         })
         .promise();
+}
+
+async function uploadViaLambda(file) {
+    if (!STATE.idToken) {
+        throw new Error("Missing id token for upload.");
+    }
+    if (!CONFIG.uploadUrl) {
+        throw new Error("Missing upload URL configuration.");
+    }
+
+    const response = await fetch(CONFIG.uploadUrl, {
+        method: "POST",
+        headers: {
+            Authorization: `Bearer ${STATE.idToken}`,
+            "X-File-Name": file.name,
+            "Content-Type": file.type || "application/octet-stream"
+        },
+        body: file
+    });
+
+    if (!response.ok) {
+        const text = await response.text();
+        throw new Error(`Upload failed (status ${response.status}): ${text}`);
+    }
 }
 
 async function downloadFile(key) {

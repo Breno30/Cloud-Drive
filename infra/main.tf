@@ -36,4 +36,17 @@ module "frontend" {
   cognito_user_pool_domain = module.cognito.user_pool_domain
   cognito_identity_pool_id = module.cognito.identity_pool_id
   region                  = data.aws_region.current.name
+  upload_url              = module.uploader.upload_url
+}
+
+module "uploader" {
+  source = "./modules/uploader"
+
+  cloud_drive_bucket_name = module.storage.cloud_drive_bucket_name
+  cloud_drive_bucket_arn  = module.storage.cloud_drive_bucket_arn
+  user_pool_id            = module.cognito.user_pool_id
+  identity_pool_id        = module.cognito.identity_pool_id
+  region                  = data.aws_region.current.name
+  frontend_origin         = local.frontend_origin
+  quota_bytes             = 100 * 1024 * 1024
 }

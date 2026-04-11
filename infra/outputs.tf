@@ -21,3 +21,7 @@ output "frontend_cloudfront_domain" {
 output "frontend_cloudfront_url" {
   value = "https://${module.cdn.domain_name}/"
 }
+
+output "upload_url" {
+  value = module.uploader.upload_url
+}

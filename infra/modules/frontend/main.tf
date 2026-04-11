@@ -57,7 +57,8 @@ resource "aws_s3_object" "frontend_config" {
     list_url            = ""
     aws_sdk_url         = "https://sdk.amazonaws.com/js/aws-sdk-2.1571.0.min.js"
     use_session_storage = true
-    storage_quota_bytes = 10 * 1024 * 1024
+    storage_quota_bytes = 100 * 1024 * 1024
+    upload_url          = var.upload_url
   })
   content_type = lookup(local.frontend_content_types, ".js", "application/javascript; charset=utf-8")
 }
