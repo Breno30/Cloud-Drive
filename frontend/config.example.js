@@ -12,6 +12,6 @@ const CONFIG = {
     listUrl: "",
     awsSdkUrl: "https://sdk.amazonaws.com/js/aws-sdk-2.1571.0.min.js",
     useSessionStorage: true,
-    storageQuotaBytes: 100 * 1024 * 1024,
+    storageQuotaBytes: 10 * 1024 * 1024,
     uploadUrl: "https://your-lambda-url.lambda-url.us-east-1.on.aws/"
 };

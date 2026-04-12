@@ -48,5 +48,5 @@ module "uploader" {
   identity_pool_id        = module.cognito.identity_pool_id
   region                  = data.aws_region.current.name
   frontend_origin         = local.frontend_origin
-  quota_bytes             = 100 * 1024 * 1024
+  quota_bytes             = 10 * 1024 * 1024
 }
