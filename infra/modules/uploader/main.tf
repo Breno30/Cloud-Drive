@@ -92,14 +92,6 @@ resource "aws_lambda_function" "uploader" {
 resource "aws_lambda_function_url" "uploader" {
   function_name      = aws_lambda_function.uploader.arn
   authorization_type = "NONE"
-
-  cors {
-    allow_origins     = ["*"]
-    allow_methods     = ["POST", "OPTIONS"]
-    allow_headers     = ["authorization", "content-type", "x-file-name"]
-    max_age           = 300
-    allow_credentials = false
-  }
 }
 
 resource "aws_lambda_permission" "uploader_url" {
