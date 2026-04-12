@@ -42,4 +42,5 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -auto-approve
+        run: terraform apply -auto-approve \
+              -var="cognito_login_url=${{ vars.COGNITO_LOGIN_URL }}" 
