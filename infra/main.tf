@@ -8,6 +8,7 @@ module "cdn" {
   frontend_bucket_regional_domain_name = module.storage.frontend_bucket_regional_domain_name
   frontend_bucket_arn                  = module.storage.frontend_bucket_arn
   frontend_bucket_id                   = module.storage.frontend_bucket_id
+  name_suffix                          = random_id.name_suffix.hex
 }
 
 module "cognito" {
@@ -15,6 +16,7 @@ module "cognito" {
 
   frontend_redirect_uri  = local.frontend_redirect_uri
   cloud_drive_bucket_arn = module.storage.cloud_drive_bucket_arn
+  name_suffix            = random_id.name_suffix.hex
 
   ui_css_file  = "${path.module}/../frontend/assets/cognito/ui.css"
   ui_logo_file = "${path.module}/../frontend/assets/cognito/logo.png"
@@ -49,4 +51,5 @@ module "uploader" {
   region                  = data.aws_region.current.name
   frontend_origin         = local.frontend_origin
   quota_bytes             = 10 * 1024 * 1024
+  name_suffix             = random_id.name_suffix.hex
 }

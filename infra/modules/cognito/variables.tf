@@ -13,3 +13,7 @@ variable "ui_css_file" {
 variable "ui_logo_file" {
   type = string
 }
+
+variable "name_suffix" {
+  type = string
+}

@@ -5,7 +5,7 @@ data "archive_file" "uploader" {
 }
 
 resource "aws_iam_role" "uploader" {
-  name = "cloud-drive-uploader"
+  name = "cloud-drive-uploader-${var.name_suffix}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -22,7 +22,7 @@ resource "aws_iam_role" "uploader" {
 }
 
 resource "aws_iam_role_policy" "uploader" {
-  name = "cloud-drive-uploader-policy"
+  name = "cloud-drive-uploader-policy-${var.name_suffix}"
   role = aws_iam_role.uploader.id
 
   policy = jsonencode({
@@ -69,7 +69,7 @@ resource "aws_iam_role_policy" "uploader" {
 }
 
 resource "aws_lambda_function" "uploader" {
-  function_name = "cloud-drive-uploader"
+  function_name = "cloud-drive-uploader-${var.name_suffix}"
   role          = aws_iam_role.uploader.arn
   handler       = "uploader.handler"
   runtime       = "python3.12"

@@ -25,3 +25,7 @@ variable "frontend_origin" {
 variable "quota_bytes" {
   type = number
 }
+
+variable "name_suffix" {
+  type = string
+}

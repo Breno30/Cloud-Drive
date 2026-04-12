@@ -1,12 +1,12 @@
 resource "aws_cognito_user_pool" "user_pool" {
-  name = "app-user-pool"
+  name = "app-user-pool-${var.name_suffix}"
 
   username_attributes      = ["email"]
   auto_verified_attributes = ["email"]
 }
 
 resource "aws_cognito_user_pool_client" "spa_client" {
-  name         = "spa-client"
+  name         = "spa-client-${var.name_suffix}"
   user_pool_id = aws_cognito_user_pool.user_pool.id
 
   generate_secret = false
@@ -21,12 +21,12 @@ resource "aws_cognito_user_pool_client" "spa_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
-  domain       = "cloud-drive"
+  domain       = "cloud-drive-${var.name_suffix}"
   user_pool_id = aws_cognito_user_pool.user_pool.id
 }
 
 resource "aws_cognito_identity_pool" "identity_pool" {
-  identity_pool_name               = "app-identity-pool"
+  identity_pool_name               = "app-identity-pool-${var.name_suffix}"
   allow_unauthenticated_identities = false
 
   cognito_identity_providers {
@@ -37,7 +37,7 @@ resource "aws_cognito_identity_pool" "identity_pool" {
 }
 
 resource "aws_iam_role" "identity_pool_authenticated" {
-  name = "identity-pool-authenticated-role"
+  name = "identity-pool-authenticated-role-${var.name_suffix}"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -62,7 +62,7 @@ resource "aws_iam_role" "identity_pool_authenticated" {
 }
 
 resource "aws_iam_role_policy" "identity_pool_authenticated_s3" {
-  name = "identity-pool-authenticated-s3"
+  name = "identity-pool-authenticated-s3-${var.name_suffix}"
   role = aws_iam_role.identity_pool_authenticated.id
 
   policy = jsonencode({

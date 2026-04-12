@@ -10,8 +10,12 @@ variable "frontend_bucket_id" {
   type = string
 }
 
+variable "name_suffix" {
+  type = string
+}
+
 resource "aws_cloudfront_origin_access_control" "frontend" {
-  name                              = "cloud-drive-frontend-oac"
+  name                              = "cloud-drive-frontend-oac-${var.name_suffix}"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
