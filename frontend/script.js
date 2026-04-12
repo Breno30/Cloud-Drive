@@ -472,6 +472,24 @@ function updateStorageUsage(items) {
     percentEl.textContent = `≈ ${percent}%`;
 }
 
+function showStorageWarning(message) {
+    const warningEl = document.getElementById("storage-warning");
+    if (!warningEl) {
+        return;
+    }
+    warningEl.textContent = message;
+    warningEl.classList.add("is-visible");
+}
+
+function clearStorageWarning() {
+    const warningEl = document.getElementById("storage-warning");
+    if (!warningEl) {
+        return;
+    }
+    warningEl.textContent = "";
+    warningEl.classList.remove("is-visible");
+}
+
 function setupUpload() {
     const button = document.getElementById("upload-button");
     const input = document.getElementById("upload-input");
@@ -662,8 +680,24 @@ async function uploadViaLambda(file) {
 
     if (!response.ok) {
         const text = await response.text();
+        let payload = null;
+        try {
+            payload = JSON.parse(text);
+        } catch {
+            payload = null;
+        }
+        if (payload && payload.error === "quota_exceeded") {
+            const usage = formatBytes(payload.usageBytes);
+            const quota = formatBytes(payload.quotaBytes);
+            const incoming = formatBytes(payload.incomingBytes);
+            showStorageWarning(
+                `Storage limit reached. ${usage} used of ${quota}. File size ${incoming}.`
+            );
+        }
         throw new Error(`Upload failed (status ${response.status}): ${text}`);
     }
+
+    clearStorageWarning();
 }
 
 async function downloadFile(key) {

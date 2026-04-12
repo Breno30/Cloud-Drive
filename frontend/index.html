@@ -377,6 +377,22 @@
       font-variant-numeric: tabular-nums;
     }
 
+    .storage-warning {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(248, 113, 113, 0.16);
+      border: 1px solid rgba(248, 113, 113, 0.6);
+      color: #fecaca;
+      font-size: 0.75rem;
+      line-height: 1.4;
+      display: none;
+    }
+
+    .storage-warning.is-visible {
+      display: block;
+    }
+
     .chip-row {
       margin-top: 10px;
       display: flex;
@@ -1266,6 +1282,7 @@
               <span class="value" id="storage-total">10 MB</span></span>
             <span class="sub" id="storage-percent">≈ 0%</span>
           </div>
+          <div class="storage-warning" id="storage-warning" role="status" aria-live="polite"></div>
         </div>
       </div>
     </aside>
