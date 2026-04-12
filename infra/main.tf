@@ -36,6 +36,7 @@ module "frontend" {
   cognito_client_id        = module.cognito.client_id
   cognito_user_pool_id     = module.cognito.user_pool_id
   cognito_user_pool_domain = module.cognito.user_pool_domain
+  cognito_login_url        = var.cognito_login_url
   cognito_identity_pool_id = module.cognito.identity_pool_id
   region                   = data.aws_region.current.name
   upload_url               = module.uploader.upload_url
