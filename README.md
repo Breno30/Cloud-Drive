@@ -76,6 +76,13 @@ terraform -chdir=infra init
 terraform -chdir=infra apply
 ```
 
+Optional: set a custom Cognito Hosted UI domain for the login URL (e.g. if you mapped your own domain to Cognito). You can pass it directly on the command line:
+
+```bash
+terraform -chdir=infra apply \
+  -var="cognito_login_url=https://auth.example.com"
+```
+
 Terraform will automatically create:
 
 * Cognito Authentication

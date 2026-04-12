@@ -13,6 +13,11 @@ resource "aws_s3_bucket_cors_configuration" "cloud_drive" {
 locals {
   frontend_files       = fileset(var.frontend_dir, "**")
   frontend_asset_files = [for file in local.frontend_files : file if file != "config.js" && file != "config.example.js"]
+  cognito_login_url = (
+    var.cognito_login_url != null && trimspace(var.cognito_login_url) != ""
+    ? var.cognito_login_url
+    : "https://${var.cognito_user_pool_domain}.auth.${var.region}.amazoncognito.com"
+  )
   frontend_content_types = {
     ".html" = "text/html; charset=utf-8"
     ".js"   = "application/javascript; charset=utf-8"
@@ -48,7 +53,7 @@ resource "aws_s3_object" "frontend_config" {
     client_id           = var.cognito_client_id
     user_pool_id        = var.cognito_user_pool_id
     token_url           = "https://${var.cognito_user_pool_domain}.auth.${var.region}.amazoncognito.com/oauth2/token"
-    login_url           = "https://${var.cognito_user_pool_domain}.auth.${var.region}.amazoncognito.com"
+    login_url           = local.cognito_login_url
     identity_url        = "https://cognito-identity.${var.region}.amazonaws.com/"
     identity_pool_id    = var.cognito_identity_pool_id
     region              = var.region

@@ -8,6 +8,8 @@ on:
 jobs:
   terraform:
     runs-on: ubuntu-latest
+    env:
+      TF_VAR_cognito_login_url: ${{ vars.COGNITO_LOGIN_URL }}
 
     defaults:
       run:
