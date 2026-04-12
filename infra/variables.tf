@@ -9,3 +9,9 @@ variable "frontend_redirect_uri_override" {
   description = "Optional override for the frontend OAuth redirect URI."
   default     = ""
 }
+
+variable "cognito_login_url" {
+  type        = string
+  description = "Optional custom Cognito Hosted UI base URL (e.g. https://auth.example.com)."
+  default     = ""
+}
