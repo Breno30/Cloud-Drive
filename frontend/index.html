@@ -823,6 +823,91 @@
       margin: 0 auto;
     }
 
+    .uploading-row {
+      background: linear-gradient(120deg, rgba(30, 64, 175, 0.08), rgba(59, 130, 246, 0.2), rgba(30, 64, 175, 0.08));
+      background-size: 200% 100%;
+      animation: upload-shimmer 1.6s ease-in-out infinite;
+      cursor: default;
+    }
+
+    .uploading-row .file-icon {
+      border-color: rgba(56, 189, 248, 0.8);
+      color: #bae6fd;
+    }
+
+    .uploading-row .file-sub {
+      color: #93c5fd;
+    }
+
+    .upload-ellipsis::after {
+      content: "...";
+      display: inline-block;
+      width: 0ch;
+      overflow: hidden;
+      vertical-align: bottom;
+      animation: upload-ellipsis 1.2s steps(3, end) infinite;
+    }
+
+    #upload-button {
+      position: relative;
+    }
+
+    #upload-button .upload-spinner {
+      width: 14px;
+      height: 14px;
+      border-radius: 999px;
+      border: 2px solid rgba(191, 219, 254, 0.35);
+      border-top-color: #bfdbfe;
+      display: inline-block;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      animation: upload-spin 0.9s linear infinite;
+    }
+
+    #upload-button.is-uploading {
+      pointer-events: none;
+      opacity: 0.85;
+      box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.6);
+    }
+
+    #upload-button.is-uploading .upload-spinner {
+      opacity: 1;
+    }
+
+    #upload-button.is-uploading .upload-label {
+      opacity: 0.75;
+    }
+
+    @keyframes upload-spin {
+      from {
+        transform: rotate(0deg);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @keyframes upload-shimmer {
+      0% {
+        background-position: 0% 50%;
+      }
+
+      100% {
+        background-position: 200% 50%;
+      }
+    }
+
+    @keyframes upload-ellipsis {
+      0% {
+        width: 0ch;
+      }
+
+      100% {
+        width: 3ch;
+      }
+    }
+
     .tiny-icon {
       width: 20px;
       height: 20px;
@@ -1206,7 +1291,8 @@
         <div class="toolbar-actions">
           <button class="pill-button" type="button" id="upload-button">
             <span class="icon"><i class="fa-solid fa-arrow-up-from-bracket"></i></span>
-            <span>Upload</span>
+            <span class="upload-label">Upload</span>
+            <span class="upload-spinner" aria-hidden="true"></span>
           </button>
           <input type="file" id="upload-input" style="display: none;" />
         </div>

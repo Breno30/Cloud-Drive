@@ -2,7 +2,9 @@ const STATE = {
     credentials: null,
     identityId: null,
     idToken: null,
-    files: []
+    files: [],
+    isUploading: false,
+    uploadingFileName: ""
 };
 
 window.addEventListener("DOMContentLoaded", () => {
@@ -324,8 +326,10 @@ function renderFileList(items) {
     }
 
     if (!items.length) {
-        listEl.appendChild(buildEmptyRow("No files found."));
-        return;
+        if (!STATE.isUploading) {
+            listEl.appendChild(buildEmptyRow("No files found."));
+            return;
+        }
     }
 
     items.forEach((item) => {
@@ -419,6 +423,11 @@ function renderFileList(items) {
         row.appendChild(deleteCell);
         listEl.appendChild(row);
     });
+
+    if (STATE.isUploading) {
+        const uploadingRow = buildUploadingRow(STATE.uploadingFileName);
+        listEl.prepend(uploadingRow);
+    }
 }
 
 function setupSearch() {
@@ -480,13 +489,109 @@ function setupUpload() {
             return;
         }
         try {
+            setUploadingState(true, file);
             await uploadFile(file);
             input.value = "";
             await listFiles({ credentials: STATE.credentials, identityId: STATE.identityId });
         } catch (error) {
             console.error(error);
+        } finally {
+            setUploadingState(false);
         }
     });
+}
+
+function setUploadingState(isUploading, file) {
+    STATE.isUploading = isUploading;
+    STATE.uploadingFileName = isUploading && file ? file.name : "";
+
+    const button = document.getElementById("upload-button");
+    const input = document.getElementById("upload-input");
+    if (button) {
+        button.classList.toggle("is-uploading", isUploading);
+        button.setAttribute("aria-busy", isUploading ? "true" : "false");
+        const label = button.querySelector(".upload-label");
+        if (label) {
+            label.textContent = isUploading ? "Uploading" : "Upload";
+        }
+    }
+    if (input) {
+        input.disabled = isUploading;
+    }
+
+    const listEl = document.getElementById("file-list");
+    if (!listEl) {
+        return;
+    }
+
+    const existing = document.getElementById("uploading-row");
+    if (isUploading) {
+        if (!existing) {
+            listEl.prepend(buildUploadingRow(STATE.uploadingFileName));
+        } else if (file) {
+            const nameEl = existing.querySelector(".file-name");
+            if (nameEl) {
+                nameEl.textContent = file.name;
+            }
+        }
+    } else if (existing) {
+        existing.remove();
+    }
+}
+
+function buildUploadingRow(filename) {
+    const row = document.createElement("div");
+    row.className = "file-row uploading-row";
+    row.id = "uploading-row";
+
+    const nameCell = document.createElement("div");
+    nameCell.className = "file-name-cell";
+
+    const icon = document.createElement("div");
+    icon.className = "file-icon";
+    icon.innerHTML = '<i class="fa-solid fa-cloud-arrow-up"></i>';
+
+    const meta = document.createElement("div");
+    meta.className = "file-meta";
+
+    const name = document.createElement("div");
+    name.className = "file-name";
+    name.textContent = filename || "Uploading file";
+
+    const sub = document.createElement("div");
+    sub.className = "file-sub upload-ellipsis";
+    sub.textContent = "Uploading";
+
+    meta.appendChild(name);
+    meta.appendChild(sub);
+    nameCell.appendChild(icon);
+    nameCell.appendChild(meta);
+
+    const dateCell = document.createElement("div");
+    dateCell.className = "file-cell";
+    dateCell.textContent = "In progress";
+
+    const sizeCell = document.createElement("div");
+    sizeCell.className = "file-cell";
+    sizeCell.textContent = "--";
+
+    const downloadCell = document.createElement("div");
+    downloadCell.className = "file-actions";
+    downloadCell.innerHTML =
+        '<span class="file-label">Download</span><button class="tiny-icon" type="button" disabled aria-hidden="true"><i class="fa-solid fa-ellipsis"></i></button>';
+
+    const deleteCell = document.createElement("div");
+    deleteCell.className = "file-actions";
+    deleteCell.innerHTML =
+        '<span class="file-label">Delete</span><button class="tiny-icon" type="button" disabled aria-hidden="true"><i class="fa-solid fa-ellipsis"></i></button>';
+
+    row.appendChild(nameCell);
+    row.appendChild(dateCell);
+    row.appendChild(sizeCell);
+    row.appendChild(downloadCell);
+    row.appendChild(deleteCell);
+
+    return row;
 }
 
 function setupLogout() {
