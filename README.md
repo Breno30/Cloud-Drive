@@ -37,13 +37,43 @@ aws configure
 
 ---
 
+# 🧰 Terraform State (S3 Backend)
+
+This repo now includes an `s3` backend block. You must configure it on init.
+Create the S3 bucket (and optional DynamoDB table) separately before running `init`.
+
+Option A: use the example file.
+
+```bash
+cp infra/backend.hcl.example infra/backend.hcl
+terraform -chdir=infra init -backend-config=backend.hcl
+```
+
+Option B: pass values directly.
+
+```bash
+terraform -chdir=infra init \\
+  -backend-config=\"bucket=your-terraform-state-bucket\" \\
+  -backend-config=\"key=cloud-drive/terraform.tfstate\" \\
+  -backend-config=\"region=us-east-1\" \\
+  -backend-config=\"encrypt=true\"
+```
+
+If you also use a DynamoDB table for state locking, add:
+
+```bash
+  -backend-config=\"dynamodb_table=terraform-state-locks\"
+```
+
+---
+
 # 🚀 Quick Start (Tutorial)
 
 Just run:
 
 ```bash
-terraform init
-terraform apply
+terraform -chdir=infra init
+terraform -chdir=infra apply
 ```
 
 Terraform will automatically create:

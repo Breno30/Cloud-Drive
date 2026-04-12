@@ -1,0 +1,8 @@
+# Copy to backend.hcl and fill values, or pass -backend-config flags directly.
+
+bucket         = "your-terraform-state-bucket"
+key            = "cloud-drive/terraform.tfstate"
+region         = "us-east-1"
+encrypt        = true
+# Optional but recommended for state locking
+# dynamodb_table = "terraform-state-locks"
