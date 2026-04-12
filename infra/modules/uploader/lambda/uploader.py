@@ -21,11 +21,9 @@ LOGIN_KEY = f"cognito-idp.{REGION}.amazonaws.com/{USER_POOL_ID}"
 
 def _cors_headers():
     return {
-        "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-        "Access-Control-Allow-Headers": "authorization,content-type,x-file-name",
-        "Access-Control-Allow-Methods": "POST,OPTIONS",
-        "Access-Control-Max-Age": "300",
-        "Vary": "Origin",
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Methods': '*'
     }
 
 
