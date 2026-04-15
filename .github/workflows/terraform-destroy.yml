@@ -1,0 +1,109 @@
+name: Terraform Destroy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "GitHub Environment to target (use environment protection rules for approvals)."
+        required: true
+        default: "production"
+      confirm:
+        description: "Type DESTROY to allow the destroy step to run."
+        required: true
+        default: ""
+      auto_approve:
+        description: "If true, runs the destroy step automatically (still requires confirm=DESTROY)."
+        type: boolean
+        required: true
+        default: false
+      tf_state_bucket:
+        description: "Optional override for the Terraform state S3 bucket (otherwise uses TF_STATE_BUCKET secret)."
+        required: false
+        default: ""
+      tf_state_key:
+        description: "Optional override for the Terraform state S3 key (otherwise uses TF_STATE_KEY secret)."
+        required: false
+        default: ""
+      aws_region:
+        description: "Optional override for AWS region used by the backend config (otherwise uses AWS_REGION secret)."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+concurrency:
+  group: terraform-${{ inputs.environment }}
+  cancel-in-progress: false
+
+jobs:
+  terraform_destroy:
+    name: Destroy (${{ inputs.environment }})
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+
+    env:
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "0"
+      TF_VAR_cognito_login_url: ${{ vars.COGNITO_LOGIN_URL }}
+      TF_VAR_frontend_origin_override: ${{ vars.COGNITO_FRONTEND_ORIGIN_OVERRIDE }}
+      TF_VAR_frontend_redirect_uri_override: ${{ vars.COGNITO_FRONTEND_REDIRECT_URI_OVERRIDE }}
+
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Configure AWS credentials
+        run: |
+          echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
+          echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
+          echo "AWS_REGION=${{ secrets.AWS_REGION }}" >> $GITHUB_ENV
+
+      - name: Terraform Init
+        env:
+          STATE_BUCKET: ${{ inputs.tf_state_bucket || secrets.TF_STATE_BUCKET }}
+          STATE_KEY: ${{ inputs.tf_state_key || secrets.TF_STATE_KEY }}
+          STATE_REGION: ${{ inputs.aws_region || secrets.AWS_REGION }}
+        run: |
+          if [ -z "$STATE_BUCKET" ] || [ -z "$STATE_KEY" ] || [ -z "$STATE_REGION" ]; then
+            echo "Missing backend config. Provide inputs (tf_state_bucket/tf_state_key/aws_region) or set secrets (TF_STATE_BUCKET/TF_STATE_KEY/AWS_REGION)."
+            exit 1
+          fi
+
+          terraform init -reconfigure \
+            -backend-config="bucket=$STATE_BUCKET" \
+            -backend-config="key=$STATE_KEY" \
+            -backend-config="region=$STATE_REGION"
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan (Destroy)
+        run: terraform plan -destroy -lock-timeout=5m -out=tfplan
+
+      - name: Upload Plan Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: terraform-destroy-plan-${{ github.run_id }}
+          path: infra/tfplan
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Terraform Destroy (Apply Plan)
+        if: ${{ inputs.auto_approve && inputs.confirm == 'DESTROY' }}
+        run: terraform apply -lock-timeout=5m -auto-approve tfplan
+
+      - name: Destroy Skipped (Safety Gate)
+        if: ${{ !(inputs.auto_approve && inputs.confirm == 'DESTROY') }}
+        run: |
+          echo "Destroy step skipped."
+          echo "To run destroy, re-run this workflow with:"
+          echo "  confirm=DESTROY"
+          echo "  auto_approve=true"
