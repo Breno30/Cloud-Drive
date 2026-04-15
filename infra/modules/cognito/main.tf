@@ -5,6 +5,10 @@ resource "aws_cognito_user_pool" "user_pool" {
   auto_verified_attributes = ["email"]
 }
 
+locals {
+  frontend_redirect_base = regexreplace(var.frontend_redirect_uri, "/[^/]*$", "")
+}
+
 resource "aws_cognito_user_pool_client" "spa_client" {
   name         = "spa-client-${var.name_suffix}"
   user_pool_id = aws_cognito_user_pool.user_pool.id
@@ -18,9 +22,11 @@ resource "aws_cognito_user_pool_client" "spa_client" {
 
   callback_urls = distinct([
     var.frontend_origin,
+    local.frontend_redirect_base,
     var.frontend_redirect_uri,
   ])
-  logout_urls   = [var.frontend_redirect_uri]
+  default_redirect_uri = var.frontend_redirect_uri
+  logout_urls          = [var.frontend_redirect_uri]
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
