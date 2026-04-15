@@ -16,7 +16,10 @@ async function main() {
     const code = params.get("code");
 
     const tokenResult = await getTokens(code);
-    const idToken = tokenResult.id_token;
+    const idToken = tokenResult?.id_token;
+    if (!idToken) {
+        throw new Error("Token response did not include an id_token.");
+    }
     STATE.idToken = idToken;
     renderUserFromToken(idToken);
     const identityId = await getIdentityId(idToken);
@@ -181,6 +184,9 @@ function isTokenExpired(jwt) {
 }
 
 function parseJwt(jwt) {
+    if (typeof jwt !== "string" || !jwt) {
+        return null;
+    }
     const parts = jwt.split(".");
     if (parts.length !== 3) {
         return null;
