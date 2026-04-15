@@ -6,7 +6,8 @@ resource "aws_cognito_user_pool" "user_pool" {
 }
 
 locals {
-  frontend_redirect_base = regexreplace(var.frontend_redirect_uri, "/[^/]*$", "")
+  frontend_redirect_parts = split("/", var.frontend_redirect_uri)
+  frontend_redirect_base  = join("/", slice(local.frontend_redirect_parts, 0, length(local.frontend_redirect_parts) - 1))
 }
 
 resource "aws_cognito_user_pool_client" "spa_client" {
