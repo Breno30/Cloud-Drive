@@ -15,6 +15,7 @@ module "cognito" {
   source = "./modules/cognito"
 
   frontend_redirect_uri  = local.frontend_redirect_uri
+  frontend_origin        = local.frontend_origin
   cloud_drive_bucket_arn = module.storage.cloud_drive_bucket_arn
   name_suffix            = random_id.name_suffix.hex
 

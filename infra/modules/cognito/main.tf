@@ -16,7 +16,10 @@ resource "aws_cognito_user_pool_client" "spa_client" {
   allowed_oauth_scopes                 = ["openid", "email", "phone"]
   supported_identity_providers         = ["COGNITO"]
 
-  callback_urls = [var.frontend_redirect_uri]
+  callback_urls = distinct([
+    var.frontend_origin,
+    var.frontend_redirect_uri,
+  ])
   logout_urls   = [var.frontend_redirect_uri]
 }
 
