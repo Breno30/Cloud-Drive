@@ -42,4 +42,4 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -var="cognito_login_url=${{ vars.COGNITO_LOGIN_URL }}" -auto-approve
+        run: terraform apply -var="cognito_login_url=${{ vars.COGNITO_LOGIN_URL }}" -var="frontend_origin_override=${{ vars.COGNITO_FRONTEND_ORIGIN_OVERRIDE }}" -var="frontend_redirect_uri_override=${{ vars.COGNITO_FRONTEND_REDIRECT_URI_OVERRIDE }}" -auto-approve
