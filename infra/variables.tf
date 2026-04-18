@@ -36,6 +36,33 @@ variable "frontend_custom_domain_name" {
   }
 }
 
+variable "cognito_custom_domain_name" {
+  type        = string
+  description = "Optional custom domain name (host only) for Cognito Hosted UI (e.g. auth.example.com). DNS records must be created separately."
+  default     = ""
+
+  validation {
+    condition = (
+      var.cognito_custom_domain_name == "" ||
+      (
+        !can(regex("://", var.cognito_custom_domain_name)) &&
+        !can(regex("/", var.cognito_custom_domain_name)) &&
+        !can(regex("\\s", var.cognito_custom_domain_name)) &&
+        !can(regex("\\*", var.cognito_custom_domain_name)) &&
+        can(regex("^([A-Za-z0-9-]+\\.)+[A-Za-z0-9-]+$", var.cognito_custom_domain_name)) &&
+        var.cognito_acm_certificate_arn != ""
+      )
+    )
+    error_message = "cognito_custom_domain_name must be a hostname only (e.g. auth.example.com), without scheme/path/whitespace/wildcards, and requires cognito_acm_certificate_arn."
+  }
+}
+
+variable "cognito_acm_certificate_arn" {
+  type        = string
+  description = "Optional ACM certificate ARN for the Cognito custom domain."
+  default     = ""
+}
+
 variable "cognito_login_url" {
   type        = string
   description = "Optional custom Cognito Hosted UI base URL (e.g. https://auth.example.com)."

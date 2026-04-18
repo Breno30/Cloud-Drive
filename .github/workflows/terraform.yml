@@ -42,4 +42,13 @@ jobs:
         run: terraform plan
 
       - name: Terraform Apply
-        run: terraform apply -var="cognito_login_url=${{ vars.COGNITO_LOGIN_URL }}" -var="frontend_origin_override=${{ vars.COGNITO_FRONTEND_ORIGIN_OVERRIDE }}" -var="frontend_redirect_uri_override=${{ vars.COGNITO_FRONTEND_REDIRECT_URI_OVERRIDE }}" -var="frontend_custom_domain_name=${{ vars.FRONTEND_CUSTOM_DOMAIN_NAME }}" -var="acm_certificate_arn=${{ secrets.CLOUDFRONT_ACM_CERTIFICATE_ARN }}" -auto-approve
+        run: |
+          terraform apply \
+            -var="cognito_login_url=${{ vars.COGNITO_LOGIN_URL }}" \
+            -var="cognito_custom_domain_name=${{ vars.COGNITO_CUSTOM_DOMAIN_NAME }}" \
+            -var="cognito_acm_certificate_arn=${{ secrets.COGNITO_ACM_CERTIFICATE_ARN }}" \
+            -var="frontend_origin_override=${{ vars.COGNITO_FRONTEND_ORIGIN_OVERRIDE }}" \
+            -var="frontend_redirect_uri_override=${{ vars.COGNITO_FRONTEND_REDIRECT_URI_OVERRIDE }}" \
+            -var="frontend_custom_domain_name=${{ vars.FRONTEND_CUSTOM_DOMAIN_NAME }}" \
+            -var="acm_certificate_arn=${{ secrets.CLOUDFRONT_ACM_CERTIFICATE_ARN }}" \
+            -auto-approve

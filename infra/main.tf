@@ -21,6 +21,9 @@ module "cognito" {
   cloud_drive_bucket_arn = module.storage.cloud_drive_bucket_arn
   name_suffix            = random_id.name_suffix.hex
 
+  cognito_custom_domain_name  = var.cognito_custom_domain_name != "" ? var.cognito_custom_domain_name : null
+  cognito_acm_certificate_arn = var.cognito_acm_certificate_arn != "" ? var.cognito_acm_certificate_arn : null
+
   ui_css_file  = "${path.module}/../frontend/assets/cognito/ui.css"
   ui_logo_file = "${path.module}/../frontend/assets/cognito/logo.png"
 }
