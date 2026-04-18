@@ -10,6 +10,12 @@ variable "frontend_redirect_uri_override" {
   default     = ""
 }
 
+variable "acm_certificate_arn" {
+  type        = string
+  description = "Optional acm certificate arn."
+  default     = ""
+}
+
 variable "cognito_login_url" {
   type        = string
   description = "Optional custom Cognito Hosted UI base URL (e.g. https://auth.example.com)."
