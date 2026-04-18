@@ -85,8 +85,13 @@ jobs:
       - name: Terraform Validate
         run: terraform validate
 
+      - name: Terraform State Cleanup (Cognito UI Customization)
+        if: ${{ inputs.confirm == 'DESTROY' }}
+        run: terraform state rm -lock-timeout=5m module.cognito.aws_cognito_user_pool_ui_customization.spa || true
+
+
       - name: Terraform Plan (Destroy)
-        run: terraform plan -destroy -lock-timeout=5m -out=tfplan
+        run: terraform plan -destroy -refresh=false -lock-timeout=5m -out=tfplan
 
       - name: Upload Plan Artifact
         uses: actions/upload-artifact@v4
@@ -98,7 +103,7 @@ jobs:
 
       - name: Terraform Destroy (Apply Plan)
         if: ${{ inputs.auto_approve && inputs.confirm == 'DESTROY' }}
-        run: terraform apply -lock-timeout=5m -auto-approve tfplan
+        run: terraform apply -refresh=false -lock-timeout=5m -auto-approve tfplan
 
       - name: Destroy Skipped (Safety Gate)
         if: ${{ !(inputs.auto_approve && inputs.confirm == 'DESTROY') }}
