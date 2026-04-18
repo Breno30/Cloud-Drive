@@ -135,4 +135,6 @@ resource "aws_cognito_user_pool_ui_customization" "spa" {
   client_id    = aws_cognito_user_pool_client.spa_client.id
   css          = file(var.ui_css_file)
   image_file   = filebase64(var.ui_logo_file)
+
+  depends_on = [aws_cognito_user_pool_domain.hosted_ui]
 }
