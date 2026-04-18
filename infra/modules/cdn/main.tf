@@ -25,19 +25,9 @@ variable "acm_certificate_arn" {
 }
 
 locals {
-  custom_domain_name_raw = (
+  custom_domain_name = (
     var.frontend_custom_domain_name != null && trimspace(var.frontend_custom_domain_name) != ""
   ) ? trimspace(var.frontend_custom_domain_name) : null
-
-  custom_domain_name = local.custom_domain_name_raw != null ? regexreplace(
-    regexreplace(
-      regexreplace(local.custom_domain_name_raw, "^https?://", ""),
-      "/.*$",
-      ""
-    ),
-    ":[0-9]+$",
-    ""
-  ) : null
 
   certificate_arn = (
     var.acm_certificate_arn != null && trimspace(var.acm_certificate_arn) != ""

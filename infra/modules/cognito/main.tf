@@ -11,19 +11,9 @@ locals {
   frontend_redirect_parts = split("/", var.frontend_redirect_uri)
   frontend_redirect_base  = join("/", slice(local.frontend_redirect_parts, 0, length(local.frontend_redirect_parts) - 1))
 
-  custom_domain_name_raw = (
+  custom_domain_name = (
     var.cognito_custom_domain_name != null && trimspace(var.cognito_custom_domain_name) != ""
   ) ? trimspace(var.cognito_custom_domain_name) : null
-
-  custom_domain_name = local.custom_domain_name_raw != null ? regexreplace(
-    regexreplace(
-      regexreplace(local.custom_domain_name_raw, "^https?://", ""),
-      "/.*$",
-      ""
-    ),
-    ":[0-9]+$",
-    ""
-  ) : null
 
   certificate_arn = (
     var.cognito_acm_certificate_arn != null && trimspace(var.cognito_acm_certificate_arn) != ""
