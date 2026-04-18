@@ -52,7 +52,7 @@ resource "aws_s3_object" "frontend_config" {
     redirect_uri        = var.frontend_redirect_uri
     client_id           = var.cognito_client_id
     user_pool_id        = var.cognito_user_pool_id
-    token_url           = "https://${var.cognito_user_pool_domain}.auth.${var.region}.amazoncognito.com/oauth2/token"
+    token_url           = "${local.cognito_login_url}/oauth2/token"
     login_url           = local.cognito_login_url
     identity_url        = "https://cognito-identity.${var.region}.amazonaws.com/"
     identity_pool_id    = var.cognito_identity_pool_id
