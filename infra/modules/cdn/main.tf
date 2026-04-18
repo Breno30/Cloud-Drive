@@ -14,7 +14,7 @@ variable "name_suffix" {
   type = string
 }
 
-variable "domain_name" {
+variable "frontend_origin" {
   type    = string
   default = null
 }
@@ -26,7 +26,7 @@ variable "acm_certificate_arn" {
 
 locals {
   use_custom_domain = (
-    var.domain_name != null &&
+    var.frontend_origin != null &&
     var.acm_certificate_arn != null
   )
 }
@@ -43,10 +43,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   default_root_object = "index.html"
 
   # Only set aliases if custom domain is used
-  aliases = local.use_custom_domain ? [var.domain_name] : []
+  aliases = local.use_custom_domain ? [var.frontend_origin] : []
 
   origin {
-    domain_name              = var.frontend_bucket_regional_domain_name
+    frontend_origin          = var.frontend_bucket_regional_frontend_origin
     origin_id                = "frontend-s3"
     origin_access_control_id = aws_cloudfront_origin_access_control.frontend.id
 
