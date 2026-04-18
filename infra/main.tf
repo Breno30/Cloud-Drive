@@ -6,6 +6,7 @@ module "cdn" {
   source = "./modules/cdn"
 
   frontend_origin                      = local.frontend_origin
+  acm_certificate_arn                  = var.acm_certificate_arn
   frontend_bucket_regional_domain_name = module.storage.frontend_bucket_regional_domain_name
   frontend_bucket_arn                  = module.storage.frontend_bucket_arn
   frontend_bucket_id                   = module.storage.frontend_bucket_id
