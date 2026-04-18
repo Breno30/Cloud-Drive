@@ -20,6 +20,20 @@ variable "frontend_custom_domain_name" {
   type        = string
   description = "Optional custom domain name (host only, no scheme) for the frontend CloudFront distribution (e.g. app.example.com)."
   default     = ""
+
+  validation {
+    condition = (
+      var.frontend_custom_domain_name == "" ||
+      (
+        !can(regex("://", var.frontend_custom_domain_name)) &&
+        !can(regex("/", var.frontend_custom_domain_name)) &&
+        !can(regex("\\s", var.frontend_custom_domain_name)) &&
+        !can(regex("\\*", var.frontend_custom_domain_name)) &&
+        can(regex("^([A-Za-z0-9-]+\\.)+[A-Za-z0-9-]+$", var.frontend_custom_domain_name))
+      )
+    )
+    error_message = "frontend_custom_domain_name must be a hostname only (e.g. app.example.com), without scheme/path/whitespace/wildcards."
+  }
 }
 
 variable "cognito_login_url" {
