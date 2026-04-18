@@ -14,6 +14,23 @@ variable "name_suffix" {
   type = string
 }
 
+variable "domain_name" {
+  type    = string
+  default = null
+}
+
+variable "acm_certificate_arn" {
+  type    = string
+  default = null
+}
+
+locals {
+  use_custom_domain = (
+    var.domain_name != null &&
+    var.acm_certificate_arn != null
+  )
+}
+
 resource "aws_cloudfront_origin_access_control" "frontend" {
   name                              = "cloud-drive-frontend-oac-${var.name_suffix}"
   origin_access_control_origin_type = "s3"
@@ -24,6 +41,9 @@ resource "aws_cloudfront_origin_access_control" "frontend" {
 resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
+
+  # Only set aliases if custom domain is used
+  aliases = local.use_custom_domain ? [var.domain_name] : []
 
   origin {
     domain_name              = var.frontend_bucket_regional_domain_name
@@ -59,7 +79,11 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = local.use_custom_domain ? false : true
+
+    acm_certificate_arn      = local.use_custom_domain ? var.acm_certificate_arn : null
+    ssl_support_method       = local.use_custom_domain ? "sni-only" : null
+    minimum_protocol_version = local.use_custom_domain ? "TLSv1.2_2021" : null
   }
 }
 
