@@ -16,6 +16,12 @@ variable "acm_certificate_arn" {
   default     = ""
 }
 
+variable "frontend_custom_domain_name" {
+  type        = string
+  description = "Optional custom domain name (host only, no scheme) for the frontend CloudFront distribution (e.g. app.example.com)."
+  default     = ""
+}
+
 variable "cognito_login_url" {
   type        = string
   description = "Optional custom Cognito Hosted UI base URL (e.g. https://auth.example.com)."
