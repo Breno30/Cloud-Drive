@@ -16,6 +16,7 @@ async function main() {
     const code = params.get("code");
 
     const tokenResult = await getTokens(code);
+    stripAuthorizationCodeFromUrl();
     const idToken = tokenResult?.id_token;
     if (!idToken) {
         throw new Error("Token response did not include an id_token.");
@@ -32,6 +33,15 @@ async function main() {
     setupUpload();
     setupSearch();
     await listFiles({ credentials, identityId });
+}
+
+function stripAuthorizationCodeFromUrl() {
+    const url = new URL(window.location.href);
+    if (!url.searchParams.has("code")) {
+        return;
+    }
+    url.searchParams.delete("code");
+    window.history.replaceState(null, "", url.toString());
 }
 
 async function getTokens(code) {
