@@ -9,6 +9,8 @@ jobs:
   terraform:
     runs-on: ubuntu-latest
     env:
+      TF_IN_AUTOMATION: "true"
+      TF_INPUT: "0"
       TF_VAR_cognito_login_url: ${{ vars.COGNITO_LOGIN_URL }}
 
     defaults:
