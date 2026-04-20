@@ -141,7 +141,7 @@ Cloud Drive App
 To remove everything:
 
 ```bash
-terraform destroy
+terraform -chdir=infra destroy
 ```
 
 ---
