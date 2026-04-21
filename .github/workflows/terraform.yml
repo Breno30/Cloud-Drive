@@ -46,5 +46,5 @@ jobs:
         run: |
           terraform apply \
             -var="domain_name=${{ vars.domain_name }}" \
-            -var="acm_certificate_arn=${{ vars.acm_certificate_arn }}" \
+            -var="acm_certificate_arn=${{ secrets.acm_certificate_arn }}" \
             -auto-approve
