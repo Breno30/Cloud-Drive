@@ -16,18 +16,6 @@ on:
         type: boolean
         required: true
         default: false
-      tf_state_bucket:
-        description: "Optional override for the Terraform state S3 bucket (otherwise uses TF_STATE_BUCKET secret)."
-        required: false
-        default: ""
-      tf_state_key:
-        description: "Optional override for the Terraform state S3 key (otherwise uses TF_STATE_KEY secret)."
-        required: false
-        default: ""
-      aws_region:
-        description: "Optional override for AWS region used by the backend config (otherwise uses AWS_REGION secret)."
-        required: false
-        default: ""
 
 permissions:
   contents: read
@@ -67,9 +55,9 @@ jobs:
 
       - name: Terraform Init
         env:
-          STATE_BUCKET: ${{ inputs.tf_state_bucket || secrets.TF_STATE_BUCKET }}
-          STATE_KEY: ${{ inputs.tf_state_key || secrets.TF_STATE_KEY }}
-          STATE_REGION: ${{ inputs.aws_region || secrets.AWS_REGION }}
+          STATE_BUCKET: ${{ secrets.TF_STATE_BUCKET }}
+          STATE_KEY: ${{ secrets.TF_STATE_KEY }}
+          STATE_REGION: ${{ secrets.AWS_REGION }}
         run: |
           if [ -z "$STATE_BUCKET" ] || [ -z "$STATE_KEY" ] || [ -z "$STATE_REGION" ]; then
             echo "Missing backend config. Provide inputs (tf_state_bucket/tf_state_key/aws_region) or set secrets (TF_STATE_BUCKET/TF_STATE_KEY/AWS_REGION)."
