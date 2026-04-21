@@ -65,9 +65,7 @@ terraform -chdir=infra init -backend-config="backend.hcl"
 Just run:
 
 ```bash
-terraform -chdir=infra apply \
-  -var="domain_name=example.com" \
-  -var="acm_certificate_arn=..."
+terraform -chdir=infra apply
 ```
 
 ---
