@@ -87,8 +87,6 @@ You will automatically be:
 3. Redirected back to Cloud Drive
 4. Access your dashboard
 
-No need to manually open Cognito Hosted UI.
-
 ---
 
 # 🔐 Authentication Flow
