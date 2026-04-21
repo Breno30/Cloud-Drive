@@ -62,7 +62,24 @@ terraform -chdir=infra init -backend-config="backend.hcl"
 
 ## 🚀 Apply
 
-Just run:
+### Custom Domain (Optional)
+
+If you want to use a custom domain, duplicate the tfvars file before applying:
+
+```bash
+cp infra/terraform.tfvars.example infra/terraform.tfvars
+```
+
+Then edit `infra/terraform.tfvars` and set **both**:
+
+- `domain_name`
+- `acm_certificate_arn`
+
+If you don't create `infra/terraform.tfvars`, Terraform will deploy using the default AWS URLs (CloudFront `*.cloudfront.net` and Cognito `*.amazoncognito.com`).
+
+### Apply
+
+Run:
 
 ```bash
 terraform -chdir=infra apply
