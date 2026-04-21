@@ -46,14 +46,16 @@ aws configure
 
 ## Init 
 
+Set up backend.hcl with your own values
+
+```bash
+cp infra/backend.hcl.example infra/backend.hcl
+```
+
 This repo now includes an `s3` backend block. You must configure it during `init`.
 
 ```bash
-terraform -chdir=infra init \
-  -backend-config="bucket=your-terraform-state-bucket" \
-  -backend-config="key=cloud-drive/terraform.tfstate" \
-  -backend-config="region=us-east-1" \
-  -backend-config="encrypt=true"
+terraform -chdir=infra init -backend-config="backend.hcl"
 ```
 
 ---
