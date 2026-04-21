@@ -1,6 +1,6 @@
-![Preview](preview.png)
+<a href="https://drive.brenodonascimento.com/" target="_blank" rel="noopener noreferrer"><img src="preview.png" alt="Preview" /></a>
 
-Live demo: https://drive.brenodonascimento.com/
+Live demo: <a href="https://drive.brenodonascimento.com/" target="_blank" rel="noopener noreferrer">https://drive.brenodonascimento.com/</a>
 
 # ☁️ Cloud Drive
 
