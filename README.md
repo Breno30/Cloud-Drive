@@ -72,8 +72,8 @@ cp infra/terraform.tfvars.example infra/terraform.tfvars
 
 Then edit `infra/terraform.tfvars` and set **both**:
 
-- `domain_name`
-- `acm_certificate_arn`
+- `domain_name` -> "example.com"
+- `acm_certificate_arn` -> must be an existing ACM certificate you create in AWS Certificate Manager with domain "*.example.com"
 
 If you don't create `infra/terraform.tfvars`, Terraform will deploy using the default AWS URLs (CloudFront `*.cloudfront.net` and Cognito `*.amazoncognito.com`).
 
