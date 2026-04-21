@@ -8,10 +8,12 @@ locals {
 
 resource "aws_s3_bucket" "cloud_drive" {
   bucket = "cloud-drive-${local.bucket_suffix}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket" "frontend" {
   bucket = "cloud-drive-frontend-${local.bucket_suffix}"
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "frontend" {
