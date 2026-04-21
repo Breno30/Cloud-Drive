@@ -1,3 +1,5 @@
+![Preview](preview.png)
+
 # ☁️ Cloud Drive
 
 A clean, minimal cloud storage application that allows users to upload, view, and delete files.
