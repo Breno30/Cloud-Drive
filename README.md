@@ -52,7 +52,7 @@ Set up backend.hcl with your own values
 cp infra/backend.hcl.example infra/backend.hcl
 ```
 
-This repo now includes an `s3` backend block. You must configure it during `init`.
+You must pass it during `init`.
 
 ```bash
 terraform -chdir=infra init -backend-config="backend.hcl"
