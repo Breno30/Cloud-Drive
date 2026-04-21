@@ -10,7 +10,8 @@ This project is designed for **quick setup** — just run Terraform and open the
 
 ---
 
-# 🚀 What This Project Creates
+<details>
+<summary>🚀 What This Project Creates</summary>
 
 Terraform automatically provisions:
 
@@ -23,9 +24,12 @@ Terraform automatically provisions:
 * 🌍 CloudFront Distribution
 * :robot: Lambda function
 
+</details>
+
 ---
 
-# 📦 Prerequisites
+<details>
+<summary>📦 Prerequisites</summary>
 
 Install:
 
@@ -40,11 +44,12 @@ terraform -v
 aws configure
 ```
 
+</details>
+
 ---
 
-# 🧰 Terraform State (S3 Backend)
-
-## Init 
+<details>
+<summary>🧰 Terraform Init</summary>
 
 Set up backend.hcl with your own values
 
@@ -58,11 +63,15 @@ You must pass it during `init`.
 terraform -chdir=infra init -backend-config="backend.hcl"
 ```
 
+</details>
+
 ---
 
-## 🚀 Apply
+<details>
+<summary>🚀 Terraform Apply</summary>
 
-### Custom Domain (Optional)
+<details>
+<summary>Custom Domain (Optional)</summary>
 
 If you want to use a custom domain, duplicate the tfvars file before applying:
 
@@ -77,17 +86,22 @@ Then edit `infra/terraform.tfvars` and set **both**:
 
 If you don't create `infra/terraform.tfvars`, Terraform will deploy using the default AWS URLs (CloudFront `*.cloudfront.net` and Cognito `*.amazoncognito.com`).
 
-### Apply
+</details>
+
+<details>
+<summary>Command</summary>
 
 Run:
 
 ```bash
 terraform -chdir=infra apply
 ```
+</details>
 
 ---
 
-# 🌍 Access the Application
+<details>
+<summary>🌍 Access the Application</summary>
 
 After Terraform finishes, it will output:
 
@@ -104,9 +118,12 @@ You will automatically be:
 3. Redirected back to Cloud Drive
 4. Access your dashboard
 
+</details>
+
 ---
 
-# 🔐 Authentication Flow
+<details>
+<summary>🔐 Authentication Flow</summary>
 
 ```
 User
@@ -127,14 +144,19 @@ Redirect Back
 Cloud Drive App
 ```
 
+</details>
+
 ---
 
-# 🧹 Destroy Resources
+<details>
+<summary>🧹 Destroy Resources</summary>
 
 To remove everything:
 
 ```bash
 terraform -chdir=infra destroy
 ```
+
+</details>
 
 ---
