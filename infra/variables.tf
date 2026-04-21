@@ -1,3 +1,8 @@
+variable "project_prefix" {
+  type        = string
+  default     = ""
+}
+
 variable "domain_name" {
   type        = string
   default     = null
