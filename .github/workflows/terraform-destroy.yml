@@ -45,9 +45,8 @@ jobs:
     env:
       TF_IN_AUTOMATION: "true"
       TF_INPUT: "0"
-      TF_VAR_cognito_login_url: ${{ vars.COGNITO_LOGIN_URL }}
-      TF_VAR_frontend_origin_override: ${{ vars.COGNITO_FRONTEND_ORIGIN_OVERRIDE }}
-      TF_VAR_frontend_redirect_uri_override: ${{ vars.COGNITO_FRONTEND_REDIRECT_URI_OVERRIDE }}
+      TF_VAR_domain_name: ${{ vars.domain_name }}
+      TF_VAR_acm_certificate_arn: ${{ vars.acm_certificate_arn }}
 
     defaults:
       run:

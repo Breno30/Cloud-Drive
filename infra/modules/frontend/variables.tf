@@ -34,11 +34,6 @@ variable "cognito_user_pool_domain" {
   type = string
 }
 
-variable "cognito_login_url" {
-  type    = string
-  default = null
-}
-
 variable "cognito_identity_pool_id" {
   type = string
 }

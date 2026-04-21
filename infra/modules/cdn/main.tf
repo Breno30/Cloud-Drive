@@ -15,28 +15,11 @@ variable "name_suffix" {
 }
 
 variable "frontend_custom_domain_name" {
-  type    = string
-  default = null
+  type = string
 }
 
 variable "acm_certificate_arn" {
-  type    = string
-  default = null
-}
-
-locals {
-  custom_domain_name = (
-    var.frontend_custom_domain_name != null && trimspace(var.frontend_custom_domain_name) != ""
-  ) ? trimspace(var.frontend_custom_domain_name) : null
-
-  certificate_arn = (
-    var.acm_certificate_arn != null && trimspace(var.acm_certificate_arn) != ""
-  ) ? trimspace(var.acm_certificate_arn) : null
-
-  use_custom_domain = (
-    local.custom_domain_name != null &&
-    local.certificate_arn != null
-  )
+  type = string
 }
 
 resource "aws_cloudfront_origin_access_control" "frontend" {
@@ -50,8 +33,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
 
-  # Only set aliases if custom domain is used
-  aliases = local.use_custom_domain ? [local.custom_domain_name] : []
+  aliases = [var.frontend_custom_domain_name]
 
   origin {
     domain_name              = var.frontend_bucket_regional_domain_name
@@ -87,11 +69,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = local.use_custom_domain ? false : true
-
-    acm_certificate_arn      = local.use_custom_domain ? local.certificate_arn : null
-    ssl_support_method       = local.use_custom_domain ? "sni-only" : null
-    minimum_protocol_version = local.use_custom_domain ? "TLSv1.2_2021" : null
+    cloudfront_default_certificate = false
+    acm_certificate_arn            = var.acm_certificate_arn
+    ssl_support_method             = "sni-only"
+    minimum_protocol_version       = "TLSv1.2_2021"
   }
 }
 

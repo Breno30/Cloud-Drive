@@ -14,8 +14,8 @@ locals {
   frontend_files       = fileset(var.frontend_dir, "**")
   frontend_asset_files = [for file in local.frontend_files : file if file != "config.js" && file != "config.example.js"]
   cognito_login_url = (
-    var.cognito_login_url != null && trimspace(var.cognito_login_url) != ""
-    ? var.cognito_login_url
+    can(regex("\\.", var.cognito_user_pool_domain))
+    ? "https://${var.cognito_user_pool_domain}"
     : "https://${var.cognito_user_pool_domain}.auth.${var.region}.amazoncognito.com"
   )
   frontend_content_types = {

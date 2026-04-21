@@ -10,19 +10,6 @@ data "aws_region" "current" {}
 locals {
   frontend_redirect_parts = split("/", var.frontend_redirect_uri)
   frontend_redirect_base  = join("/", slice(local.frontend_redirect_parts, 0, length(local.frontend_redirect_parts) - 1))
-
-  custom_domain_name = (
-    var.cognito_custom_domain_name != null && trimspace(var.cognito_custom_domain_name) != ""
-  ) ? trimspace(var.cognito_custom_domain_name) : null
-
-  certificate_arn = (
-    var.cognito_acm_certificate_arn != null && trimspace(var.cognito_acm_certificate_arn) != ""
-  ) ? trimspace(var.cognito_acm_certificate_arn) : null
-
-  use_custom_domain = (
-    local.custom_domain_name != null &&
-    local.certificate_arn != null
-  )
 }
 
 resource "aws_cognito_user_pool_client" "spa_client" {
@@ -46,10 +33,10 @@ resource "aws_cognito_user_pool_client" "spa_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
-  domain       = local.use_custom_domain ? local.custom_domain_name : "cloud-drive-${var.name_suffix}"
+  domain       = var.cognito_custom_domain_name
   user_pool_id = aws_cognito_user_pool.user_pool.id
 
-  certificate_arn = local.use_custom_domain ? local.certificate_arn : null
+  certificate_arn = var.cognito_acm_certificate_arn
 }
 
 resource "aws_cognito_identity_pool" "identity_pool" {

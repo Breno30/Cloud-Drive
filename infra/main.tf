@@ -5,8 +5,8 @@ module "storage" {
 module "cdn" {
   source = "./modules/cdn"
 
-  frontend_custom_domain_name          = var.frontend_custom_domain_name != "" ? var.frontend_custom_domain_name : null
-  acm_certificate_arn                  = var.acm_certificate_arn != "" ? var.acm_certificate_arn : null
+  frontend_custom_domain_name          = local.frontend_custom_domain_name
+  acm_certificate_arn                  = var.acm_certificate_arn
   frontend_bucket_regional_domain_name = module.storage.frontend_bucket_regional_domain_name
   frontend_bucket_arn                  = module.storage.frontend_bucket_arn
   frontend_bucket_id                   = module.storage.frontend_bucket_id
@@ -21,8 +21,8 @@ module "cognito" {
   cloud_drive_bucket_arn = module.storage.cloud_drive_bucket_arn
   name_suffix            = random_id.name_suffix.hex
 
-  cognito_custom_domain_name  = var.cognito_custom_domain_name != "" ? var.cognito_custom_domain_name : null
-  cognito_acm_certificate_arn = var.cognito_acm_certificate_arn != "" ? var.cognito_acm_certificate_arn : null
+  cognito_custom_domain_name  = local.cognito_custom_domain_name
+  cognito_acm_certificate_arn = var.acm_certificate_arn
 
   ui_css_file  = "${path.module}/../frontend/assets/cognito/ui.css"
   ui_logo_file = "${path.module}/../frontend/assets/cognito/logo.png"
@@ -42,7 +42,6 @@ module "frontend" {
   cognito_client_id        = module.cognito.client_id
   cognito_user_pool_id     = module.cognito.user_pool_id
   cognito_user_pool_domain = module.cognito.user_pool_domain
-  cognito_login_url        = var.cognito_login_url
   cognito_identity_pool_id = module.cognito.identity_pool_id
   region                   = data.aws_region.current.name
   upload_url               = module.uploader.upload_url
