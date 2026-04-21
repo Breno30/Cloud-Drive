@@ -15,11 +15,21 @@ variable "name_suffix" {
 }
 
 variable "frontend_custom_domain_name" {
-  type = string
+  type    = string
+  default = null
 }
 
 variable "acm_certificate_arn" {
-  type = string
+  type    = string
+  default = null
+
+  validation {
+    condition = (
+      var.acm_certificate_arn == null ||
+      can(regex("^arn:aws(-[a-z]+)?:acm:[a-z0-9-]+:[0-9]{12}:certificate\\/.+$", var.acm_certificate_arn))
+    )
+    error_message = "acm_certificate_arn must look like a valid ACM certificate ARN."
+  }
 }
 
 resource "aws_cloudfront_origin_access_control" "frontend" {
@@ -33,7 +43,7 @@ resource "aws_cloudfront_distribution" "frontend" {
   enabled             = true
   default_root_object = "index.html"
 
-  aliases = [var.frontend_custom_domain_name]
+  aliases = var.frontend_custom_domain_name == null ? [] : [var.frontend_custom_domain_name]
 
   origin {
     domain_name              = var.frontend_bucket_regional_domain_name
@@ -69,10 +79,10 @@ resource "aws_cloudfront_distribution" "frontend" {
   }
 
   viewer_certificate {
-    cloudfront_default_certificate = false
+    cloudfront_default_certificate = var.acm_certificate_arn == null
     acm_certificate_arn            = var.acm_certificate_arn
-    ssl_support_method             = "sni-only"
-    minimum_protocol_version       = "TLSv1.2_2021"
+    ssl_support_method             = var.acm_certificate_arn == null ? null : "sni-only"
+    minimum_protocol_version       = var.acm_certificate_arn == null ? null : "TLSv1.2_2021"
   }
 }
 

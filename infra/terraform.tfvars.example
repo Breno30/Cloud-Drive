@@ -1,2 +1,5 @@
-domain_name         = "example.com"
-acm_certificate_arn = "..."
+# Optional: set BOTH to enable custom domains.
+# If unset, the app is served via the CloudFront domain and Cognito uses the default AWS domain.
+#
+# domain_name         = "example.com"
+# acm_certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"

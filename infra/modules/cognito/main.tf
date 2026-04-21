@@ -10,6 +10,7 @@ data "aws_region" "current" {}
 locals {
   frontend_redirect_parts = split("/", var.frontend_redirect_uri)
   frontend_redirect_base  = join("/", slice(local.frontend_redirect_parts, 0, length(local.frontend_redirect_parts) - 1))
+  cognito_domain          = var.cognito_custom_domain_name == null ? "authdrive-${var.name_suffix}" : var.cognito_custom_domain_name
 }
 
 resource "aws_cognito_user_pool_client" "spa_client" {
@@ -33,7 +34,7 @@ resource "aws_cognito_user_pool_client" "spa_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "hosted_ui" {
-  domain       = var.cognito_custom_domain_name
+  domain       = local.cognito_domain
   user_pool_id = aws_cognito_user_pool.user_pool.id
 
   certificate_arn = var.cognito_acm_certificate_arn
