@@ -17,10 +17,10 @@ Terraform automatically provisions:
 * 🔐 Amazon Cognito User Pool
 * ⚡ Cognito App Client
 * 🌐 Cognito Hosted UI
+* 🎨 Cognito Hosted UI Branding
 * 📦 S3 Bucket (Frontend + Storage)
 * 🔑 IAM Roles & Policies
 * 🌍 CloudFront Distribution
-* 🎨 Cognito Hosted UI Branding
 * :robot: Lambda function
 
 ---
