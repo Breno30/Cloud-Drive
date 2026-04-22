@@ -7,6 +7,8 @@ const STATE = {
     uploadingFileName: ""
 };
 
+const MAX_UPLOAD_BYTES = 1 * 1024 * 1024;
+
 window.addEventListener("DOMContentLoaded", () => {
     main().catch((error) => console.error(error));
 });
@@ -520,6 +522,14 @@ function setupUpload() {
     input.addEventListener("change", async () => {
         const file = input.files && input.files[0];
         if (!file) {
+            return;
+        }
+        clearStorageWarning();
+        if (file.size > MAX_UPLOAD_BYTES) {
+            showStorageWarning(
+                `Max upload size is ${formatBytes(MAX_UPLOAD_BYTES)}. Selected file is ${formatBytes(file.size)}.`
+            );
+            input.value = "";
             return;
         }
         try {
