@@ -98,6 +98,8 @@ terraform -chdir=infra apply
 ```
 </details>
 
+</details>
+
 ---
 
 <details>
